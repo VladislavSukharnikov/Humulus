@@ -1,0 +1,12 @@
+# Cache
+noise_cache/
+
+# Julia
+*.ji
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

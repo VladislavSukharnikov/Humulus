@@ -23,17 +23,15 @@ Pkg.add(url="https://github.com/VladislavSukharnikov/MyLib.jl")
 ---
 
 ## Usage
-
-First, load the project
+First, load the package:
 
 ```julia
 using Humulus
 ```
 
-A few examples of usage are given in folder examples.
+Several usage examples are provided in the `examples` directory.
 
-First, one has to initialize all parameters required for the integration. One of the required objects is the bath-correlation function (BCF). While internal functions allow for definition of any type of BCF, the public constructors include squeezed-reservoirs, for instance, in example1.jl
-
+Before running a simulation, all parameters required for the integration must be initialized. One of the required objects is the bath-correlation function (BCF). Although the internal API supports arbitrary BCF definitions, the public constructors currently include squeezed reservoirs. For example, in `example1.jl`:
 
 ```julia
 bcf = let
@@ -42,13 +40,14 @@ bcf = let
     r  = 1.5       # squeezing parameter
     φ  = 0.0       # squeezing phase
     γ  = 1.0       # atom–field coupling strength
-    
+
     one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ)
 end
 ```
-this creates a BCF functor, that can be called as bcf(t,s) and has fields that store essential information about the BCF, for instance, bcf.Γ includes decay rates for all effective modes. The number of modes can be found as Humulus.n_modes(bcf).
 
-The second object is the atomic parameters. The current code is implemented only for a two-level atom, and atomic parameters accept only the resonance frequency and initial (pure) state condition
+This creates a BCF functor that can be called as `bcf(t, s)`. The returned object also stores parameters associated with the BCF. For example, `bcf.Γ` contains the decay rates of all effective modes. The number of modes is given by `Humulus.n_modes(bcf)`. Another available public constructor is `three_mode_squeezed_bcf`.
+
+The second required object specifies the atomic parameters. The current implementation supports only a two-level atom. The atomic parameters consist of the resonance frequency and the initial pure state:
 
 ```julia
 atom_params = let
@@ -63,7 +62,37 @@ atom_params = let
     AtomParams(ν₀, c_g, c_e)
 end
 ```
-The output is the immutable struct.
+
+This returns an immutable `AtomParams` object.
+
+The third required object defines the time grid used for the numerical integration:
+
+```julia
+grid_params = let
+    t_end    = 20.0  # final simulation time
+    n_save   = 250   # number of intervals between saved time points
+    substeps = 4     # maximum internal integration substeps per save interval
+
+    @info "Expected minimal number of steps is $(n_save * substeps)."
+
+    GridParams(t_end, n_save, substeps)
+end
+```
+
+The differential equations are solved using the `DifferentialEquations.jl` library, specifically the adaptive `Tsit5` solver. The `substeps` parameter determines the maximum allowed time step, `dt_max`, which is stored in `grid_params.dt_max` and computed as the spacing between consecutive saved time points divided by `substeps`.
+
+Finally, the pseudo-Fock space truncation must be specified:
+
+```julia
+# Truncation of the pseudo-Fock basis
+max_occupancy = 50
+```
+
+If the number of modes is $N$, the truncation can be specified either as an $N$-element tuple, an $N$-element vector, or a single integer. In the latter case, the basis includes all occupation-number configurations satisfying
+
+$$
+\sum_i n_i \le \texttt{max\_occupancy}.
+$$
 
 <!-- ---
 

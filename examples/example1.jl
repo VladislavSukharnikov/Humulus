@@ -92,7 +92,7 @@ end
 
 
 
-n_trajectories = 1000
+n_trajectories = 1
 out = @time solve_hops(
     grid_params,
     bcf,

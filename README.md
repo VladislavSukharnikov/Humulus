@@ -94,8 +94,46 @@ $$
 \sum\_i n\_i \le \text{max}\textunderscore\text{occupancy}.
 $$
 
-<!-- ---
 
+Now the non-markovian problem can be solved in one of two ways.
+
+To solve the hierarchy of master equations (HME), run
+
+```julia
+ρ_s = solve_hme(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy,
+)
+```
+
+This returns the reduced system density matrix `ρ_s` with dimensions `ρ_s[i, j, t]`, where `i` and `j` label the atomic states (ground and excited), and `t` indexes the saved time points.
+
+Alternatively, the hierarchy of pure states (HOPS) can be solved by specifying the number of trajectories:
+
+```julia
+n_trajectories = 1000
+
+out = solve_hops(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy,
+    n_trajectories;
+    clear_cache = false,
+)
+```
+
+The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data are deleted after the computation completes.
+
+The cache is intended primarily for distributed computations. In such settings, sending large eigendecomposition matrices to workers causes significant serialization overhead. Instead, the eigendecomposition is stored in a `.jld2` file, which each worker can load independently. This approach is designed for computational clusters with a shared filesystem, such as the DESY Maxwell Cluster.
+
+The returned object `out` is an `ArrayPartition` containing two arrays. The first stores the accumulated density matrix over all trajectories, while the second contains the total number of trajectories. The physical density matrix is therefore obtained as
+
+```julia
+ρ_s = out.x[1] ./ out.x[2]
+```
 
 ## Documentation
 

@@ -54,7 +54,7 @@ The result is written in-place to `dρ`.
 
     # Iterate over all hierarchy elements.
     @inbounds for n_idx in 1:fock_dim
-        for m_idx in 1:fock_dim
+        for m_idx in n_idx:fock_dim
 
             # Current auxiliary density operator.
             rho_nm  = @view  ρ[:,:,n_idx,m_idx]
@@ -128,6 +128,14 @@ The result is written in-place to `dρ`.
             drho_nm[2,1]= dρ₂₁-totalΓ*ρ₂₁
             drho_nm[1,2]= dρ₁₂-totalΓ*ρ₁₂
             drho_nm[2,2]= dρ₂₂-totalΓ*ρ₂₂
+
+            if n_idx != m_idx
+                dρ[1,1,m_idx,n_idx] = conj(drho_nm[1,1])
+                dρ[2,1,m_idx,n_idx] = conj(drho_nm[1,2])
+                dρ[1,2,m_idx,n_idx] = conj(drho_nm[2,1])
+                dρ[2,2,m_idx,n_idx] = conj(drho_nm[2,2])
+            end
+            
         end
     end
     return nothing

@@ -6,12 +6,10 @@
                         n_trajectories::Int,
                         path::String,
                     ) where {N, MaxFockStates}
-    
     (; dt_max, ts_save) = grid_params
 
     # Create noise sampler.
     sampler!::NoiseSampler = sampler_from_cache(path, checks=false, clear_cache=false)::NoiseSampler;
-
 
     # Container for the physical density matrix
     ρ_s = zeros(ComplexF64, 2, 2, ts_save.n_points)

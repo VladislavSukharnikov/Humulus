@@ -43,8 +43,8 @@ end
 
 grid_params = let
     t_end    = 20.0  # final simulation time
-    n_save   = 500   # number of intervals between saved time points
-    substeps = 2     # maximum internal integration substeps per save interval
+    n_save   = 250   # number of intervals between saved time points
+    substeps = 4     # maximum internal integration substeps per save interval
     @info "Expected minimal number of steps is $(n_save*substeps)."
     GridParams(t_end, n_save, substeps)
 end
@@ -67,7 +67,7 @@ max_occupancy = 50
     bcf,
     atom_params,
     max_occupancy,
-)
+);
 
 
 # -----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ end
 
 
 
-n_trajectories = 1
+n_trajectories = 1000
 out = @time solve_hops(
     grid_params,
     bcf,
@@ -113,3 +113,31 @@ let ts_save = grid_params.ts_save;
 
     plot(p1, p2, p3, layout=(3, 1), size=(700, 800))
 end
+
+
+max_occupancies = 50
+fock_space      = Humulus.FockSpace(Val(N), max_occupancies, Int, Int)
+    solver_params   = Humulus.create_solver_params(bcf, fock_space, atom_params)
+    max_fock_states = maximum(max_occupancies)+1
+
+(; ts_save, dt_max) = grid_params;
+
+    # Container for the physical density matrix
+    ρ_s = zeros(ComplexF64, 2, 2, ts_save.n_points)
+
+    (; fock_dim, c_g, c_e) = solver_params
+    hme! = Humulus.HME{N,MaxFockStates}();
+    ρ_0  = Humulus.init_hme(fock_dim, c_g, c_e)
+    prob = ODEProblem{true}(ODEFunction{true}(hme!), ρ_0, (ts_save.t_start, ts_save.t_end), solver_params);
+
+    data = solve(
+            prob, 
+            Tsit5(), 
+            adaptive=true, 
+            dtmax=dt_max, 
+            saveat=ts_save, 
+            dense = false, 
+            save_everystep = false, 
+            calck = false,
+            progress = true,
+        )

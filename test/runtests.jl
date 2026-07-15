@@ -3,7 +3,7 @@ using Test
 @testset "Humulus" begin
     println("Running Humulus tests...")
 
-    include("setup.jl")
+    include("test_setup.jl")
 
     include("tests/test_bcf.jl")
     include("tests/test_fock_space.jl")

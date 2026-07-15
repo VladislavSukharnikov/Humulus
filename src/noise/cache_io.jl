@@ -100,6 +100,8 @@ function create_noise_cache(
         try
             bcf_eigen::BCFEigen = load_object(path)::BCFEigen
             loaded_bcf::BCF     = bcf_eigen.bcf::BCF
+
+            @info "Found existing cache."
             if  loaded_bcf == bcf &&
                 bcf_eigen.time_grid[1] == 0.0 &&
                 bcf_eigen.time_grid[end] >= t_end &&

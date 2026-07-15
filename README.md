@@ -15,44 +15,55 @@ This implementation accompanies the paper:
 
 ## Installation
 
-For now, the code has not yet been unified into a single module. To set it up, include the following file:
-
 ```julia
-include("src/Humulus.jl")
+using Pkg
+Pkg.add(url="https://github.com/VladislavSukharnikov/MyLib.jl")
 ```
 
-This file imports the required packages, includes all necessary files, and defines constants.
-
 ---
 
-## Source Files
-
-| File | Description |
-|------|-------------|
-| `input.jl` | Definition of model and simulation parameters. |
-| `bcf.jl` | Construction of bath correlation functions. |
-| `fock_space.jl` | Construction of the truncated pseudo-Fock space.  |
-| `setup.jl` | Project setup. |
-| `solver_params.jl` | Assembly of parameters required by the numerical solvers. |
-| `hme/hme.jl` | Solver for the Hierarchy of Master Equations. |
-| `hops/hops.jl` | Solver for the Hierarchy of Pure States. |
-| `hops/noise.jl` | Generation of stochastic noise. |
-
----
-
-## Examples
+## Usage
 
 First, load the project
 
 ```julia
-include("src/setup.jl")
+using Humulus
 ```
 
-The example of usage is provided in
+A few examples of usage are given in folder examples.
+
+First, one has to initialize all parameters required for the integration. One of the required objects is the bath-correlation function (BCF). While internal functions allow for definition of any type of BCF, the public constructors include squeezed-reservoirs, for instance, in example1.jl
+
 
 ```julia
-include("examples/example1.jl")
+bcf = let
+    ω₀ = 5.0       # central (carrier) frequency
+    Γ  = 1.0       # spectral half-width
+    r  = 1.5       # squeezing parameter
+    φ  = 0.0       # squeezing phase
+    γ  = 1.0       # atom–field coupling strength
+    
+    one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ)
+end
 ```
+this creates a BCF functor, that can be called as bcf(t,s) and has fields that store essential information about the BCF, for instance, bcf.Γ includes decay rates for all effective modes. The number of modes can be found as Humulus.n_modes(bcf).
+
+The second object is the atomic parameters. The current code is implemented only for a two-level atom, and atomic parameters accept only the resonance frequency and initial (pure) state condition
+
+```julia
+atom_params = let
+    # central (carrier) frequency
+    ν₀ = 5.0
+
+    # Initial atomic state:
+    # |ψ⟩ = c_g |g⟩ + c_e |e⟩
+    c_e = inv(√2)
+    c_g = inv(√2) * exp(-1im * π/4)
+
+    AtomParams(ν₀, c_g, c_e)
+end
+```
+The output is the immutable struct.
 
 <!-- ---
 

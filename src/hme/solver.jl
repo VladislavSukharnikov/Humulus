@@ -107,9 +107,12 @@ end
             progress = true,
         )
 
-    for save_idx in 1:ts_save.n_points
-        ρ_s_slice = @view ρ_s[:,:,save_idx]
-        u_slice = view(data.u[save_idx],:,:,1,1)
+    # for i in eachindex(data.t)
+    #     @views ρ_s[:, :, i] .= data[:, :, 1, 1, i]
+    # end
+    for t_idx in 1:ts_save.n_points
+        ρ_s_slice = @view ρ_s[:,:,t_idx]
+        u_slice = @view data[:, :, 1, 1, t_idx]
         ρ_s_slice .= u_slice
     end
 

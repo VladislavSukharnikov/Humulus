@@ -22,6 +22,13 @@ end
 
 @inline (func::FuncWrapper)(t::Float64) = func.f(t, func.params...)
 
+Base.:(==)(x::FuncWrapper, y::FuncWrapper) =
+    x.f == y.f &&
+    x.params == y.params
+
+Base.isequal(x::FuncWrapper, y::FuncWrapper) =
+    isequal(x.f, y.f) &&
+    isequal(x.params, y.params)
 
 # =============================================================================
 # Bath-correlation function. 
@@ -69,6 +76,20 @@ end
 # Number of effective modes.
 n_modes(::BCF{N}) where {N} = N
 
+# Value equality.
+Base.:(==)(x::BCF, y::BCF) =
+    x.Γ == y.Γ &&
+    x.G == y.G &&
+    x.f_vector == y.f_vector &&
+    x.g_vector == y.g_vector
+
+# Exact equality.
+Base.isequal(x::BCF, y::BCF) =
+    isequal(x.Γ, y.Γ) &&
+    isequal(x.G, y.G) &&
+    isequal(x.f_vector, y.f_vector) &&
+    isequal(x.g_vector, y.g_vector)
+
 
 # =============================================================================
 # Bath-correlation function evaluation.
@@ -96,8 +117,7 @@ function (bcf::BCF{N})(
     # Time difference entering the exponential memory kernels.
     τ = abs(t-s)
 
-    output::ComplexF64 = 0.0 + 0.0im
-
+    output = 0.0im
     for j in 1:N
         output += G[j]^2 * f_vector[j](t) * conj(g_vector[j](s)) * exp(-Γ[j] * τ)
     end

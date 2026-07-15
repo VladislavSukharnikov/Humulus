@@ -26,18 +26,18 @@ function BCFEigen(
     time_grid = TimeGrid(0.0, t_end, grid_size)
 
     # Assemble the discretized BCF kernel matrix.
-    bcf_matrix = zeros(ComplexF64, grid_size, grid_size)
-    for t in 1:grid_size, s in 1:grid_size
+    bcf_matrix = Matrix{ComplexF64}(undef, grid_size, grid_size)
+    @inbounds for t in 1:grid_size, s in 1:grid_size
         bcf_matrix[t,s] = bcf(time_grid[t], time_grid[s])
     end
 
     # Compute the eigendecomposition of the BCF kernel.
-    vals, vecs = eigen(bcf_matrix)
+    vals, vecs = eigen!(Hermitian(bcf_matrix))
 
     # Warn if the kernel is not positive semidefinite.
-    if any(real(vals) .< 0)
+    if any(vals .< 0.0)
         @warn "Negative eigenvalue detected."
     end
 
-    return BCFEigen(bcf, time_grid, sqrt.(real(vals)), vecs)
+    return BCFEigen(bcf, time_grid, sqrt.(vals), vecs)
 end

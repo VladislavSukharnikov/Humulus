@@ -90,9 +90,9 @@ max_occupancy = 50
 
 If the number of modes is $N$, the truncation can be specified either as an $N$-element tuple, an $N$-element vector, or a single integer. In the latter case, the basis includes all occupation-number configurations satisfying
 
-```math
-\sum_i n_i \le \texttt{max_occupancy}.
-```
+$$
+\sum\_i n\_i \le \texttt{max\_occupancy}.
+$$
 
 <!-- ---
 

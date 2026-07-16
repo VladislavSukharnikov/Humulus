@@ -166,12 +166,6 @@ In this example, each of the `n_workers` workers computes `n_trajectories` indep
 
 ---
 
-## Documentation
-
-A detailed description is provided in **documentation.pdf**. -->
-
----
-
 ## Citation
 
 If you use this software in academic work, please cite

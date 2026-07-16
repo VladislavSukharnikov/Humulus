@@ -121,8 +121,8 @@ out = solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories;
-    clear_cache = false,
-    show_progress = true,
+    clear_cache=false,
+    show_progress=true,
 )
 ```
 
@@ -156,9 +156,9 @@ out = @time solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories;
-    clear_cache = true,
-    show_progress = false,
-    workers = workers(),
+    clear_cache=true,
+    show_progress=false,
+    workers=workers(),
 )
 
 ρ_s = out.x[1] / out.x[2]

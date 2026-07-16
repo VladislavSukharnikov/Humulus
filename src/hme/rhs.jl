@@ -28,20 +28,20 @@ function (hme::HME{N})(
     end
  
     # Compute the HME right-hand side.
-    fill_dρ!(dρ, ρ, solver_params, f_tmp, g_tmp, _sqrt_of_int) 
+    _fill_dρ!(dρ, ρ, solver_params, f_tmp, g_tmp, _sqrt_of_int) 
 
     return nothing
 end
 
 
 """
-    fill_dρ!(dρ, ρ, solver_params, f_tmp, g_tmp, sqrt_of_int)
+    _fill_dρ!(dρ, ρ, solver_params, f_tmp, g_tmp, sqrt_of_int)
 
 Evaluate the right-hand side of the hierarchy of master equations.
 
 The result is written in-place to `dρ`.
 """
-@inline function fill_dρ!(
+@inline function _fill_dρ!(
                         dρ::Array{ComplexF64,4},
                         ρ::Array{ComplexF64,4},
                         solver_params::NamedTuple,

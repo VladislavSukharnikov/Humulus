@@ -3,6 +3,7 @@ include("debug_utils.jl")
 # =============================================================================
 # Debugging: reconstruct the BCF from Monte Carlo noise sampling.
 # =============================================================================
+
 let 
     # Construct BCF.
     bcf = three_mode_squeezed_bcf(5.0, 2.0, 1.0, 0.5, 0.0, 1.0)
@@ -53,6 +54,7 @@ end
 # =============================================================================
 # Debugging: Visually inspect the interpolation of the noise on the finer grid.
 # =============================================================================
+
 let 
     # Construct BCF.
     bcf = three_mode_squeezed_bcf(5.0, 2.0, 1.0, 0.5, 0.0, 1.0)
@@ -107,6 +109,7 @@ end
 # =============================================================================
 # Debugging: @code_warntype inspection of sampler!(z).
 # =============================================================================
+
 let 
     println("\n\n=============================================")
     println("Running @code_warntype for `sampler!(z)`")

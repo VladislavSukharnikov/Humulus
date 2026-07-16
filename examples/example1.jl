@@ -118,11 +118,11 @@ out = @time solve_hops(
     max_occupancy,
     n_trajectories;
     clear_cache=false,
-    workers=workers(),
     show_progress=false,
+    workers=workers(),
 );
 
-ρ_s = out.x[2]/out.x[1]
+ρ_s = out.x[1]./out.x[2]
 
 @info "Expected number of trajectories: $(n_trajectories*length(workers())) "
 @info "Total number of trajectories: $(out.x[2][1])"

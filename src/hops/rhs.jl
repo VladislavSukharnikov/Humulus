@@ -23,11 +23,11 @@ function (hops::HOPS{N})(du::ArrayPartition{ComplexF64},
     end
 
     # Compute the HOPS right-hand side.
-    fill_dψ!(dψ, ψ, solver_params, L_av, z_t, f_tmp, g_tmp, hops._sqrt_of_int) 
+    _fill_dψ!(dψ, ψ, solver_params, L_av, z_t, f_tmp, g_tmp, hops._sqrt_of_int) 
     return nothing
 end
 
-@inline function fill_dψ!(dψ::AbstractArray{ComplexF64,2},
+@inline function _fill_dψ!(dψ::AbstractArray{ComplexF64,2},
                            ψ::AbstractArray{ComplexF64,2},
                            solver_params::NamedTuple, 
                            L_av::ComplexF64,

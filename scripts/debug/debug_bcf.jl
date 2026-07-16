@@ -1,6 +1,23 @@
 include("debug_utils.jl");
 
 # =============================================================================
+# Debugging: @code_warntype inspection of a random BCF.
+# =============================================================================
+
+let 
+    # Construct BCF.
+    N = 100
+    bcf = Humulus.random_bcf(N)
+    t,s = rand(2)
+
+    # Trigger compilation.
+    bcf(t,s)
+
+    @code_warntype bcf(t,s)
+end
+
+
+# =============================================================================
 # Debugging: @code_warntype inspection of one_mode_squeezed_bcf(...).
 # =============================================================================
 

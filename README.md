@@ -122,6 +122,7 @@ out = solve_hops(
     max_occupancy,
     n_trajectories;
     clear_cache = false,
+    show_progress = true,
 )
 ```
 
@@ -156,6 +157,7 @@ out = @time solve_hops(
     max_occupancy,
     n_trajectories;
     clear_cache = true,
+    show_progress = false,
     workers = workers(),
 )
 

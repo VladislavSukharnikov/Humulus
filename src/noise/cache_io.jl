@@ -58,7 +58,7 @@ end
 
 
 """
-    create_noise_cache(bcf, t_end, grid_size) -> String
+    get_bcf_eigen_cache(bcf, t_end, grid_size) -> String
 
 Create or reuse a cached `BCFEigen` object.
 
@@ -67,7 +67,7 @@ and the discretization grid size. If a matching cache file already exists,
 its path is returned. Otherwise, a new `BCFEigen` object is constructed,
 saved to disk, and its path is returned.
 
-Cache files are stored in the `noise_cache` directory.
+Cache files are stored in the `bcf_eigen_cache` directory.
 
 # Arguments
 - `bcf`: bath correlation function.
@@ -83,13 +83,13 @@ An existing cache file is reused only if its contents are consistent with
 the requested parameters. Otherwise, it is replaced with a newly generated
 cache.
 """
-function create_noise_cache(
+function get_bcf_eigen_cache(
                         bcf::BCF,
                         t_end::Float64,
                         grid_size::Int,
                     )
 
-    dir = "noise_cache"
+    dir = "bcf_eigen_cache"
     mkpath(dir)
 
     key      = (t_end, bcf, grid_size)
@@ -101,32 +101,34 @@ function create_noise_cache(
             bcf_eigen::BCFEigen = load_object(path)::BCFEigen
             loaded_bcf::BCF     = bcf_eigen.bcf::BCF
 
-            @info "Found existing cache."
+            @info "Found an existing noise cache."
             if  loaded_bcf == bcf &&
                 bcf_eigen.time_grid[1] == 0.0 &&
                 bcf_eigen.time_grid[end] >= t_end &&
                 bcf_eigen.time_grid.n_points == grid_size 
 
-                @info "Reusing noise cache."
+                @info "The existing noise cache is compatible. Reusing it."
                 return path
             end
-            @info "Creating noise cache."
+            @info "The existing noise cache is incompatible. Rebuilding."
         catch err
-            @info "Failed to read noise cache. Recreating." exception=(err, catch_backtrace())
+            @info "Failed to read the existing noise cache. Rebuilding." exception=(err, catch_backtrace())
         end
     else
-        @info "Rebuilding noise cache."
+        @info "No existing noise cache found. Building a new one."
     end
 
+    @info "Computing the eigendecomposition of a $grid_size × $grid_size matrix."
     bcf_eigen = BCFEigen(bcf, t_end, grid_size)
     save_object(path, bcf_eigen)
+    @info "Eigendecomposition completed. Results saved to \"$path\"."
 
     return path
 end
 
 
-function clear_noise_cache()
-    dir = "noise_cache"
+function clear_bcf_eigen_cache()
+    dir = "bcf_eigen_cache"
     isdir(dir) || return
 
     for entry in readdir(dir; join=true)

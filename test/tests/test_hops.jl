@@ -1,5 +1,5 @@
 @testset "HOPS" begin
-    println("HOPS: construction")
+    @info "HOPS: construction"
 
     test_cases = (
         (1, 0),
@@ -41,18 +41,20 @@
     end
 
     @testset "Invalid inputs" begin
-        @test_throws AssertionError HOPS{0,1}(time_grid)
-        @test_throws AssertionError HOPS{1,0}(time_grid)
-        @test_throws AssertionError HOPS{1,-1}(time_grid)
-        @test_throws AssertionError HOPS{-1,1}(time_grid)
-        @test_throws AssertionError HOPS{1.0,1}(time_grid)
-        @test_throws AssertionError HOPS{1,1.0}(time_grid)
+
+        @test_throws ArgumentError HOPS{1.0,1}(time_grid)
+        @test_throws ArgumentError HOPS{1,1.0}(time_grid)
+
+        @test_throws DomainError HOPS{0,1}(time_grid)
+        @test_throws DomainError HOPS{1,0}(time_grid)
+        @test_throws DomainError HOPS{1,-1}(time_grid)
+        @test_throws DomainError HOPS{-1,1}(time_grid)
     end
 end;
 
 
 @testset "HOPS (function)" begin
-    println("HOPS: evaluation")
+    @info "HOPS: evaluation"
 
     test_cases = (
         (1, 0),
@@ -158,5 +160,6 @@ end;
 
         @test @ballocated($hops!($du, $u, $solver_params, $t)) == 0
     end
-    println("HOPS: done")
+
+    @info "HOPS: done"
 end;

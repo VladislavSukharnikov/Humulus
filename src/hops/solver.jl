@@ -83,7 +83,7 @@ function solve_hops(
     dt_noise  = dt_max / noise_oversampling
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
 
-    path = create_noise_cache(bcf, ts_save.t_end, grid_size)
+    path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size)
 
     if workers==[1]
         output = _solve_hops(

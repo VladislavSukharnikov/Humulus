@@ -1,5 +1,5 @@
 @testset "BCF" begin
-    println("BCF: predefined constructors")
+    @info "BCF: predefined constructors"
 
     BCF_RTOL = 1e-12
     BCF_ATOL = 1e-14
@@ -98,7 +98,7 @@
         end
     end
 
-    println("BCF: construction")
+    @info "BCF: construction"
 
     @testset "Construction" begin
         for n in (2, 3, 4, 20, 30, 40)
@@ -122,5 +122,5 @@
         end
     end
 
-    println("BCF: done")
+    @info "BCF: done"
 end;

@@ -42,8 +42,8 @@ let
 
     bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
 
-    mkpath("noise_cache")
-    path = joinpath("noise_cache", "bench_noise.jld2")
+    mkpath("bcf_eigen_cache")
+    path = joinpath("bcf_eigen_cache", "bench_noise.jld2")
     save_object(path, bcf_eigen)
 
     sampler! = Humulus.sampler_from_cache(path; checks = true, clear_cache = false)
@@ -74,8 +74,8 @@ let
 
         bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("noise_cache")
-        path = joinpath("noise_cache", "bench_noise.jld2")
+        mkpath("bcf_eigen_cache")
+        path = joinpath("bcf_eigen_cache", "bench_noise.jld2")
 
         save_object(path, bcf_eigen)
 

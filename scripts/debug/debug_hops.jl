@@ -69,7 +69,7 @@ let
     noise_oversampling = 2
     dt_noise = dt_max / noise_oversampling
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
-    path = Humulus.create_noise_cache(bcf, ts_save.t_end, grid_size)
+    path = Humulus.get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size)
 
     n_trajectories = 1
 

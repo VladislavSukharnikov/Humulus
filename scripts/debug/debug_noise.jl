@@ -11,7 +11,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.create_noise_cache(bcf, t_end, grid_size)
+        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -61,7 +61,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 20
-        path = Humulus.create_noise_cache(bcf, t_end, grid_size)
+        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -119,7 +119,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.create_noise_cache(bcf, t_end, grid_size)
+        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -152,7 +152,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.create_noise_cache(bcf, t_end, grid_size)
+        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -192,7 +192,7 @@ let
     grid_size = 20
 
     # Create cache.
-    path = Humulus.create_noise_cache(bcf, t_end, grid_size)
+    path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
 
     # Trigger compilation.
     sampler! = Humulus.sampler_from_cache(
@@ -210,11 +210,11 @@ end
 
 
 # =============================================================================
-# Debugging: @code_warntype inspection of create_noise_cache(...).
+# Debugging: @code_warntype inspection of get_bcf_eigen_cache(...).
 # =============================================================================
 let 
     println("\n\n===================================================")
-    println("Running @code_warntype for `create_noise_cache(...)`")
+    println("Running @code_warntype for `get_bcf_eigen_cache(...)`")
     println("===================================================\n")
 
     # Construct BCF.
@@ -226,8 +226,8 @@ let
     n_points = 100;
 
     # Trigger compilation.
-    path = Humulus.create_noise_cache(bcf, t_end, n_points)
+    path = Humulus.get_bcf_eigen_cache(bcf, t_end, n_points)
     rm(path)
 
-    @code_warntype Humulus.create_noise_cache(bcf, t_end, n_points)
+    @code_warntype Humulus.get_bcf_eigen_cache(bcf, t_end, n_points)
 end

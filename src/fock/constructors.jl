@@ -27,23 +27,39 @@ function FockSpace(
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int
             ) where {N}
+    # Input validation.    
+    N > 0 || throw(DomainError(N, "The number of modes must be positive."))
+    if max_occupancies isa Union{Tuple, Vector{Int}}
 
-    @assert N isa Int "Number of modes must be integer."
-    @assert N>0       "Number of modes must be positive."
+        length(max_occupancies) == N ||
+            throw(DimensionMismatch("Expected $N truncation levels, but got $(length(max_occupancies))."))
+        all(>=(0), max_occupancies) ||
+            throw(DomainError(max_occupancies, "All truncation levels must be non-negative."))
 
-    if max_occupancies isa Tuple || max_occupancies isa Vector{Int} 
-        fock_dim = prod(big.(max_occupancies.+1))
-        @assert length(max_occupancies) == N "Incorrect size of the truncation list."
-        @assert fock_dim <= typemax(Int) "The Fock space size exceeds the maximum array index size."
-        @assert all(>=(0), max_occupancies) "All truncation levels must be non-negative."
-        @assert fock_dim <= typemax(IndType) "The Fock space size exceeds the range of `IndType`."
-        @assert all(<=(typemax(KeyType)), max_occupancies)  "Some truncation levels exceed the range of `KeyType`."
+        fock_dim = prod(big.(max_occupancies .+ 1))
+        fock_dim <= typemax(Int) ||
+            throw(ArgumentError("The resulting Fock space contains $fock_dim states, which exceeds the maximum array index size ($(typemax(Int)))."))
+        fock_dim <= typemax(IndType) ||
+            throw(ArgumentError("The selected IndType cannot represent a Fock space of size $fock_dim."))
+
+        all(<=(typemax(KeyType)), max_occupancies) ||
+            throw(ArgumentError("The selected KeyType cannot represent one or more truncation levels."))
+
     elseif max_occupancies isa Integer
-        fock_dim = binomial(big(max_occupancies+N),N)
-        @assert fock_dim <= typemax(Int) "The Fock space size exceeds the maximum array index size."
-        @assert max_occupancies >= 0 "The truncation level must be non-negative."
-        @assert fock_dim <= typemax(IndType) "The Fock space size exceeds the range of `IndType`."
-        @assert max_occupancies<=typemax(KeyType) "Some truncation levels exceed the range of `KeyType`."
+
+        max_occupancies >= 0 ||
+            throw(DomainError(max_occupancies, "The truncation level must be non-negative."))
+        max_occupancies <= typemax(KeyType) ||
+            throw(ArgumentError("The selected KeyType cannot represent the truncation level $max_occupancies."))
+
+        fock_dim = binomial(big(max_occupancies + N), N)
+        fock_dim <= typemax(Int) ||
+            throw(ArgumentError("The resulting Fock space contains $fock_dim states, which exceeds the maximum array index size ($(typemax(Int)))."))
+        fock_dim <= typemax(IndType) ||
+            throw(ArgumentError("The selected IndType cannot represent a Fock space of size $fock_dim."))
+
+    else
+        throw(ArgumentError("`max_occupancies` must be either an Integer or a tuple/vector of integers."))
     end
 
     if max_occupancies isa Vector
@@ -71,9 +87,9 @@ function FockSpace(
     )
 
     # Verify that the generated basis has the expected size.
-    @assert length(state_to_index)==length(basis_states)==fock_dim "The generated Fock space has an unexpected size."
-
-    # Precompute neighboring basis indices for raising and lowering operators.
+    @assert length(state_to_index) == length(basis_states) == fock_dim  "Internal error: inconsistent Fock space size."
+    
+        # Precompute neighboring basis indices for raising and lowering operators.
     raise_index = zeros(IndType, N, fock_dim)
     lower_index = zeros(IndType, N, fock_dim)
 

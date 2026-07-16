@@ -8,12 +8,21 @@ struct HOPS{N,MaxFockStates}<:Function
 end
 
 function HOPS{N,MaxFockStates}(time_grid::TimeGrid) where {N,MaxFockStates}
-    @assert N isa Int "Number of modes must be integer."
-    @assert N > 0     "Number of modes must be positive."
 
-    @assert MaxFockStates isa Int "`MaxFockStates` must be integer."
-    @assert MaxFockStates >= 1     "`MaxFockStates` must be larger or equal 1."
+    # Input validation. 
+    N isa Int ||
+        throw(ArgumentError("The number of modes `N` must be an `Int`, got $(typeof(N))."))
 
+    MaxFockStates isa Int ||
+        throw(ArgumentError("`MaxFockStates` must be an `Int`, got $(typeof(MaxFockStates))."))
+
+    N > 0 ||
+        throw(DomainError(N, "The number of modes `N` must be positive."))
+
+    MaxFockStates >= 1 ||
+        throw(DomainError(MaxFockStates, "`MaxFockStates` must be at least 1, since the vacuum state is always included."))
+
+        
     # Allocate temporary buffers.
     f_tmp = zeros(MVector{N,ComplexF64})
     g_tmp = zeros(MVector{N,ComplexF64})

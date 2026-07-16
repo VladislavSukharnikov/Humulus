@@ -1,5 +1,5 @@
 @testset "HME" begin
-    println("HME: construction")
+    @info "HME: construction"
 
     test_cases = (
         (1, 0),
@@ -38,17 +38,19 @@
     end
 
     @testset "Invalid inputs" begin
-        @test_throws AssertionError HME{0,1}()
-        @test_throws AssertionError HME{1,0}()
-        @test_throws AssertionError HME{1,-1}()
-        @test_throws AssertionError HME{-1,1}()
-        @test_throws AssertionError HME{1.0,1}()
-        @test_throws AssertionError HME{1,1.0}()
+        @test_throws ArgumentError HME{1.0,1}()
+        @test_throws ArgumentError HME{1,1.0}()
+
+        @test_throws DomainError HME{0,1}()
+        @test_throws DomainError HME{1,0}()
+        @test_throws DomainError HME{1,-1}()
+        @test_throws DomainError HME{-1,1}()
+        
     end
 end;
 
 @testset "HME (function)" begin
-    println("HME: evaluation")
+    @info "HME: evaluation"
     test_cases = (
         (1, 0),
         (1, (5,)),
@@ -134,5 +136,5 @@ end;
         @test @ballocated($hme!($dρ, $ρ, $solver_params, $t)) == 0
     end
 
-    println("HME: done")
+    @info "HME: done"
 end;

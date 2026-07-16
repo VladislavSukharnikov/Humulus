@@ -33,13 +33,23 @@ function three_mode_squeezed_bcf(
 
     # Sanity checks for physical validity.
 
-    @assert Γ₀ ≥ 0 "Input linewidth Γ₀ must be non-negative."
-    @assert κ ≥ 0 "Cavity loss rate κ must be non-negative."
-    @assert γ ≥ 0 "Light–matter coupling γ must be non-negative."
-    @assert ϵ ≥ 0 "Pump amplitude ϵ must be non-negative (its phase is specified by φ)."
+    Γ₀ >= 0 ||
+        throw(DomainError(Γ₀, "The input linewidth Γ₀ must be non-negative."))
 
-    @assert κ > ϵ "The stability condition κ > ϵ must hold."
-    @assert Γ₀ > κ + ϵ "The input linewidth must satisfy Γ₀ > κ + ϵ."
+    κ >= 0 ||
+        throw(DomainError(κ, "The cavity loss rate κ must be non-negative."))
+
+    γ >= 0 ||
+        throw(DomainError(γ, "The light–matter coupling γ must be non-negative."))
+
+    ϵ >= 0 ||
+        throw(DomainError(ϵ, "The pump amplitude ϵ must be non-negative. Use φ to specify the pump phase."))
+
+    κ > ϵ ||
+        throw(ArgumentError("The stability condition κ > ϵ must hold (got κ = $κ, ϵ = $ϵ)."))
+
+    Γ₀ > κ + ϵ ||
+        throw(ArgumentError("The input linewidth must satisfy Γ₀ > κ + ϵ (got Γ₀ = $Γ₀, κ + ϵ = $(κ + ϵ))."))
 
     # Effective mode decay rates.
     Γ₋ = κ - ϵ
@@ -100,9 +110,14 @@ function one_mode_squeezed_bcf(
                         γ::Float64,
                     )
 
-    @assert Γ>=0  "Memory decay rate `Γ` cannot be negative."
-    @assert γ>=0  "Light-matter coupling `γ` cannot be negative."
-    @assert r>=0  "Squeezing parameter `r` cannot be negative (its phase is specified by φ)."
+    Γ >= 0 ||
+        throw(DomainError(Γ, "The memory decay rate Γ must be non-negative."))
+
+    γ >= 0 ||
+        throw(DomainError(γ, "The light-matter coupling γ must be non-negative."))
+
+    r >= 0 ||
+        throw(DomainError(r, "The squeezing parameter r must be non-negative. Use φ to specify the squeezing phase."))
 
     # Effective coupling strength.
     Γ′ = SVector{1}(Γ)

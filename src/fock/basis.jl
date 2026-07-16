@@ -95,7 +95,8 @@ Fock-space basis.
                     ) where {N,KeyType<:Integer,IndType<:Integer}
 
     # Reject shifts that produce invalid occupation numbers.
-    @assert 1<=mode<=N "Out of bounds when looking for entries."
+    @assert 1 <= mode <= N "Internal error: invalid mode index $mode (valid range is 1:$N)."
+    
     if occupation_shift<0 && state[mode]<abs(occupation_shift)
         return zero(IndType)
     elseif state[mode]+occupation_shift > typemax(KeyType)

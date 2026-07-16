@@ -74,7 +74,6 @@ module Humulus
             GridParams,
             solve_hme,
             solve_hops,
-            bloch_vector,
-            clear_noise_cache
+            bloch_vector
     nothing
 end 

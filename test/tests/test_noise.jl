@@ -1,5 +1,5 @@
 @testset "BCFEigen" begin
-    println("BCFEigen: construction")
+    @info "BCFEigen: construction"
 
     test_cases = (
         (1, 100),
@@ -13,8 +13,8 @@
         t_end = 20.0
         bcf_eigen = BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("noise_cache")
-        path = joinpath("noise_cache", "test.jld2")
+        mkpath("bcf_eigen_cache")
+        path = joinpath("bcf_eigen_cache", "test.jld2")
         save_object(path, bcf_eigen)
 
         @testset "Serialization" begin
@@ -28,12 +28,12 @@
 
         rm(path; force=true)
     end
-    println("BCFEigen: done")
+    @info "BCFEigen: done"
 end;
 
 
 @testset "NoiseSampler" begin
-    println("NoiseSampler: construction")
+    @info "NoiseSampler: construction"
 
     test_cases = (
         (1, 100),
@@ -47,8 +47,8 @@ end;
         t_end = 20.0
         bcf_eigen = BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("noise_cache")
-        path = joinpath("noise_cache", "test.jld2")
+        mkpath("bcf_eigen_cache")
+        path = joinpath("bcf_eigen_cache", "test.jld2")
         save_object(path, bcf_eigen)
 
         @testset "Construction" begin
@@ -63,7 +63,7 @@ end;
 
 
 @testset "NoiseSampler (function)" begin
-    println("NoiseSampler: evaluation")
+    @info "NoiseSampler: evaluation"
 
     test_cases = (
         (1, 100),
@@ -77,8 +77,8 @@ end;
         t_end = 20.0
         bcf_eigen = BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("noise_cache")
-        path = joinpath("noise_cache", "test.jld2")
+        mkpath("bcf_eigen_cache")
+        path = joinpath("bcf_eigen_cache", "test.jld2")
         save_object(path, bcf_eigen)
 
         sampler! = sampler_from_cache(path; checks=true, clear_cache=true)
@@ -110,8 +110,8 @@ end;
         t_end = 20.0
         bcf_eigen = BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("noise_cache")
-        path = joinpath("noise_cache", "test.jld2")
+        mkpath("bcf_eigen_cache")
+        path = joinpath("bcf_eigen_cache", "test.jld2")
         save_object(path, bcf_eigen)
 
         sampler! = sampler_from_cache(path; checks=true, clear_cache=true)
@@ -122,5 +122,5 @@ end;
 
         @test @ballocated($sampler!($noise)) == 0
     end
-    println("NoiseSampler: done")
+    @info "NoiseSampler: done"
 end;

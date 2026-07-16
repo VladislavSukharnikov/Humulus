@@ -1,5 +1,5 @@
 # Cache
-noise_cache/
+bcf_eigen_cache/
 
 # Julia
 *.ji

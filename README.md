@@ -155,7 +155,7 @@ out = @time solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories;
-    clear_cache = false,
+    clear_cache = true,
     workers = workers(),
 )
 

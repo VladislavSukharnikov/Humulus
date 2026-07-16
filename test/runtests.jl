@@ -1,7 +1,7 @@
 include("test_setup.jl")
 
 @testset "Humulus" begin
-    println("Running Humulus tests...")
+    @info "Running Humulus tests..."
 
     include("tests/test_bcf.jl")
     include("tests/test_fock.jl")
@@ -9,5 +9,5 @@ include("test_setup.jl")
     include("tests/test_noise.jl")
     include("tests/test_hops.jl")
 
-    println("Finished Humulus tests.")
-end
+    @info "Finished Humulus tests."
+end;

@@ -1,5 +1,5 @@
 @testset "FockSpace" begin
-    println("FockSpace: construction")
+   @info "FockSpace: construction"
 
     key_types = (Int16, Int32, Int64)
     ind_types = (Int16, Int32, Int64)
@@ -144,15 +144,15 @@
         @test_throws MethodError FockSpace(Val(2), (5, 5, 5), Int16, Int32)
         @test_throws MethodError FockSpace(Val(2), [0.1, 0.2], Int16, Int32)
 
-        @test_throws AssertionError FockSpace(Val(0), 10)
-        @test_throws AssertionError FockSpace(Val(2), (-1, 5))
-        @test_throws AssertionError FockSpace(Val(2), [-1, 5])
-        @test_throws AssertionError FockSpace(Val(2), [5], Int16, Int32)
-        @test_throws AssertionError FockSpace(Val(2), [5,5,5], Int16, Int32)
-        @test_throws AssertionError FockSpace(Val(2), [5], Int16, Int32)
-        @test_throws AssertionError FockSpace(Val(1), 200, Int8, Int8)
-        @test_throws AssertionError FockSpace(Val(1), 200, Int, Int8)
-        @test_throws AssertionError FockSpace(Val(1), 200, Int8, Int)
+        @test_throws DomainError FockSpace(Val(0), 10)
+        @test_throws DomainError FockSpace(Val(2), (-1, 5))
+        @test_throws DomainError FockSpace(Val(2), [-1, 5])
+        @test_throws DimensionMismatch FockSpace(Val(2), [5], Int16, Int32)
+        @test_throws DimensionMismatch FockSpace(Val(2), [5,5,5], Int16, Int32)
+        @test_throws DimensionMismatch FockSpace(Val(2), [5], Int16, Int32)
+        @test_throws ArgumentError FockSpace(Val(1), 200, Int8, Int8)
+        @test_throws ArgumentError FockSpace(Val(1), 200, Int, Int8)
+        @test_throws ArgumentError FockSpace(Val(1), 200, Int8, Int)
     end
 
     @testset "Zero occupancy" begin
@@ -174,5 +174,5 @@
         @test tuple_space.lower_index == vector_space.lower_index
     end
 
-    println("FockSpace: done")
+    @info "FockSpace: done"
 end;

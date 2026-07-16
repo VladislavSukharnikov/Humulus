@@ -27,6 +27,7 @@ function FockSpace(
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int
             ) where {N}
+        
     # Input validation.    
     N > 0 || throw(DomainError(N, "The number of modes must be positive."))
     if max_occupancies isa Union{Tuple, Vector{Int}}

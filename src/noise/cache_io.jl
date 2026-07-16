@@ -101,21 +101,21 @@ function get_bcf_eigen_cache(
             bcf_eigen::BCFEigen = load_object(path)::BCFEigen
             loaded_bcf::BCF     = bcf_eigen.bcf::BCF
 
-            @info "Found an existing noise cache."
+            @info "Found an existing cache."
             if  loaded_bcf == bcf &&
                 bcf_eigen.time_grid[1] == 0.0 &&
                 bcf_eigen.time_grid[end] >= t_end &&
                 bcf_eigen.time_grid.n_points == grid_size 
 
-                @info "The existing noise cache is compatible. Reusing it."
+                @info "The existing cache is compatible. Reusing it."
                 return path
             end
-            @info "The existing noise cache is incompatible. Rebuilding."
+            @info "The existing cache is incompatible. Rebuilding."
         catch err
-            @info "Failed to read the existing noise cache. Rebuilding." exception=(err, catch_backtrace())
+            @info "Failed to read the existing cache. Rebuilding." exception=(err, catch_backtrace())
         end
     else
-        @info "No existing noise cache found. Building a new one."
+        @info "No existing cache found. Building a new one."
     end
 
     @info "Computing the eigendecomposition of a $grid_size × $grid_size matrix."

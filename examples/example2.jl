@@ -70,42 +70,35 @@ out = @time solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories,
-    clear_cache=false
+    clear_cache=false,
+    show_progress=true,
 );
 
 # -----------------------------------------------------------------------------
 # Sample trajectories.
 # -----------------------------------------------------------------------------
 
+# # # # # # # # # # #
+
 using Distributed
 
+addprocs(5)
 
-ρ_s = out.x[1] ./ out.x[2]
+@everywhere using Humulus
 
-job_list = [1000 for _ in 1:workers_num]
+n_trajectories = 100
+out = @time solve_hops(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy,
+    n_trajectories;
+    clear_cache=false,
+    show_progress=true,
+    workers=workers(),
+);
 
-wp = WorkerPool(workers())  # workers is Vector{Int} of worker IDs
+ρ_s = out.x[1]./out.x[2]
 
-
-out = pmap(wp, job_list) do n_traj
-        integrate_trajectories(path, n_traj, bcf, grid_params, atom_params, max_occupancies)
-    end
-
-    out_sum = sum(out)
-
-    
-# -----------------------------------------------------------------------------
-# Plotting mean Bloch vector components
-# -----------------------------------------------------------------------------
-
-using Plots
-
-let ts_save=grid_params.ts_save, ρ_s=ρ_s
-    σˣ, σʸ, σᶻ = bloch_vector(ρ_s, ts_save.n_points)
-
-    p1 = plot(ts_save, real(σˣ), ylims=(-1,1), xlabel="Time", title="Mean x-component", label = "x");
-    p2 = plot(ts_save, real(σʸ), ylims=(-1,1), xlabel="Time", title="Mean y-component", label = "y");
-    p3 = plot(ts_save, real(σᶻ), ylims=(-0.4,0), xlabel="Time", title="Mean z-component", label = "z");
-
-    plot(p1, p2, p3, layout=(3, 1), size=(700, 800))
-end
+@info "Expected number of trajectories: $(n_trajectories*length(workers())) "
+@info "Total number of trajectories: $(out.x[2][1])"

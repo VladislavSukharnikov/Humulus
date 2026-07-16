@@ -108,6 +108,7 @@ out = @time solve_hops(
 using Distributed
 
 addprocs(5)
+
 @everywhere using Humulus
 
 n_trajectories = 100
@@ -120,6 +121,8 @@ out = @time solve_hops(
     clear_cache=false,
     workers=workers(),
 );
+
+ρ_s = out.x[2]/out.x[1]
 
 @info "Expected number of trajectories: $(n_trajectories*length(workers())) "
 @info "Total number of trajectories: $(out.x[2][1])"

@@ -135,6 +135,37 @@ The returned object `out` is an `ArrayPartition` containing two arrays. The firs
 ρ_s = out.x[1] ./ out.x[2]
 ```
 
+## Parallel execution
+
+The package supports parallel computation of stochastic trajectories using Julia's `Distributed` standard library. Initialize workers and pass them to `solve_hops` via the `workers` keyword argument:
+
+```julia
+using Distributed
+
+n_workers = 5
+addprocs(n_workers)
+
+@everywhere using Humulus
+
+n_trajectories = 100
+
+out = @time solve_hops(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy,
+    n_trajectories;
+    clear_cache = false,
+    workers = workers(),
+)
+
+ρ_s = out.x[1] / out.x[2]
+```
+
+In this example, each of the `n_workers` workers computes `n_trajectories` independent trajectories. Consequently, `out.x[2]` is expected to equal `n_workers * n_trajectories`.
+
+---
+
 ## Documentation
 
 A detailed description is provided in **documentation.pdf**. -->

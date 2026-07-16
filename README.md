@@ -17,7 +17,7 @@ This implementation accompanies the paper:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/VladislavSukharnikov/MyLib.jl")
+Pkg.add(url="https://github.com/VladislavSukharnikov/Humulus.jl")
 ```
 
 ---

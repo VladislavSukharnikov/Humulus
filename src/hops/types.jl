@@ -12,7 +12,7 @@ function HOPS{N,MaxFockStates}(time_grid::TimeGrid) where {N,MaxFockStates}
     @assert N > 0     "Number of modes must be positive."
 
     @assert MaxFockStates isa Int "`MaxFockStates` must be integer."
-    @assert MaxFockStates > 1     "`MaxFockStates` must be larger or equal 1."
+    @assert MaxFockStates >= 1     "`MaxFockStates` must be larger or equal 1."
 
     # Allocate temporary buffers.
     f_tmp = zeros(MVector{N,ComplexF64})

@@ -71,6 +71,7 @@ function solve_hops(
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int,
                 clear_cache::Bool=true,
+                workers::Vector{Int}=[1],
             ) where {N}
 
     fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
@@ -79,21 +80,35 @@ function solve_hops(
 
     # Discretize the noise on a finer grid.
     (; dt_max, ts_save) = grid_params
-
-
     dt_noise  = dt_max / noise_oversampling
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
 
     path = create_noise_cache(bcf, ts_save.t_end, grid_size)
 
-    output = _solve_hops(
-                    Val(N), 
-                    Val(max_fock_states),  
-                    grid_params, 
-                    solver_params, 
-                    n_trajectories,
-                    path,
-                )
+    if workers==[1]
+        output = _solve_hops(
+                        Val(N), 
+                        Val(max_fock_states),  
+                        grid_params, 
+                        solver_params, 
+                        n_trajectories,
+                        path,
+                    )
+    else
+        wp = WorkerPool(workers)
+        jobs = fill(n_trajectories, length(workers))
+        data_all = pmap(wp, jobs) do ntraj
+                        _solve_hops(
+                            Val(N),
+                            Val(max_fock_states),
+                            grid_params,
+                            solver_params,
+                            ntraj,
+                            path,
+                            )
+                end
+        output = sum(data_all[:])
+    end
 
     if clear_cache
         rm(path)

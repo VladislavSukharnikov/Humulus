@@ -33,6 +33,7 @@ function FockSpace(
 
     if max_occupancies isa Tuple || max_occupancies isa Vector{Int} 
         fock_dim = prod(big.(max_occupancies.+1))
+        @assert length(max_occupancies) == N "Incorrect size of the truncation list."
         @assert fock_dim <= typemax(Int) "The Fock space size exceeds the maximum array index size."
         @assert all(>=(0), max_occupancies) "All truncation levels must be non-negative."
         @assert fock_dim <= typemax(IndType) "The Fock space size exceeds the range of `IndType`."

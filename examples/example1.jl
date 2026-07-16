@@ -4,6 +4,7 @@
 
 using Humulus
 
+# clear_noise_cache()
 
 # -----------------------------------------------------------------------------
 # Squeezed reservoir parameters
@@ -102,42 +103,23 @@ out = @time solve_hops(
     clear_cache=false,
 );
 
-ρ_s_av = out.x[1] ./ out.x[2]
+# # # # # # # # # # #
 
-let ts_save = grid_params.ts_save;
-    σˣ, σʸ, σᶻ = bloch_vector(ρ_s_av);
+using Distributed
 
-    p1 = plot(ts_save, real(σˣ), ylims=(-1,1), xlabel="Time", title="Mean x-component", label = "x");
-    p2 = plot(ts_save, real(σʸ), ylims=(-1,1), xlabel="Time", title="Mean y-component", label = "y");
-    p3 = plot(ts_save, real(σᶻ), ylims=(-0.4,0), xlabel="Time", title="Mean z-component", label = "z");
+addprocs(5)
+@everywhere using Humulus
 
-    plot(p1, p2, p3, layout=(3, 1), size=(700, 800))
-end
+n_trajectories = 100
+out = @time solve_hops(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy,
+    n_trajectories;
+    clear_cache=false,
+    workers=workers(),
+);
 
-
-max_occupancies = 50
-fock_space      = Humulus.FockSpace(Val(N), max_occupancies, Int, Int)
-    solver_params   = Humulus.create_solver_params(bcf, fock_space, atom_params)
-    max_fock_states = maximum(max_occupancies)+1
-
-(; ts_save, dt_max) = grid_params;
-
-    # Container for the physical density matrix
-    ρ_s = zeros(ComplexF64, 2, 2, ts_save.n_points)
-
-    (; fock_dim, c_g, c_e) = solver_params
-    hme! = Humulus.HME{N,MaxFockStates}();
-    ρ_0  = Humulus.init_hme(fock_dim, c_g, c_e)
-    prob = ODEProblem{true}(ODEFunction{true}(hme!), ρ_0, (ts_save.t_start, ts_save.t_end), solver_params);
-
-    data = solve(
-            prob, 
-            Tsit5(), 
-            adaptive=true, 
-            dtmax=dt_max, 
-            saveat=ts_save, 
-            dense = false, 
-            save_everystep = false, 
-            calck = false,
-            progress = true,
-        )
+@info "Expected number of trajectories: $(n_trajectories*length(workers())) "
+@info "Total number of trajectories: $(out.x[2][1])"

@@ -1,4 +1,4 @@
 [deps]
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
-Humulus = "9b244b17-2948-40bd-b26a-62ccb4fcf3fd"
+Humulus = "1ef259b0-6fdc-45d2-8c94-1b37a1830b09"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"

@@ -123,3 +123,13 @@ function create_noise_cache(
 
     return path
 end
+
+
+function clear_noise_cache()
+    dir = "noise_cache"
+    isdir(dir) || return
+
+    for entry in readdir(dir; join=true)
+        rm(entry; recursive=true, force=true)
+    end
+end

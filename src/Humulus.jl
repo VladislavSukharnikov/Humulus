@@ -12,8 +12,11 @@ module Humulus
     using RecursiveArrayTools
     using LinearAlgebra
 
-    # Input/output
+    # Input/output/caching
     using JLD2
+
+    # Parallel computation
+    using Distributed
 
 
     # =============================================================================
@@ -71,6 +74,7 @@ module Humulus
             GridParams,
             solve_hme,
             solve_hops,
-            bloch_vector
+            bloch_vector,
+            clear_noise_cache
     nothing
 end 

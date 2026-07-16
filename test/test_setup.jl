@@ -1,9 +1,11 @@
 using Humulus
-using StaticArrays
-using LinearAlgebra
-using JLD2
-using RecursiveArrayTools
+using Test
 using BenchmarkTools
+
+using StaticArrays
+using JLD2
+using LinearAlgebra
+using RecursiveArrayTools
 
 using Humulus:
     BCF,
@@ -13,6 +15,7 @@ using Humulus:
     FuncWrapper,
     FockSpace,
     BCFEigen,
+    TimeGrid,
     sampler_from_cache,
     HME,
     HOPS, 

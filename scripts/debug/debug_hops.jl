@@ -74,6 +74,7 @@ let
     n_trajectories = 1
 
     # Trigger compilation.
+    showprogress = false
     output = Humulus._solve_hops(
                     Val(N), 
                     Val(max_fock_states),  
@@ -81,6 +82,7 @@ let
                     solver_params, 
                     n_trajectories,
                     path,
+                    showprogress,
                 )
 
     @code_warntype Humulus._solve_hops(
@@ -90,6 +92,7 @@ let
                     solver_params, 
                     n_trajectories,
                     path,
+                    showprogress,
                 )
     rm(path)
 end

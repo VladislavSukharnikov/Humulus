@@ -1,5 +1,5 @@
 @testset "HME" begin
-    @info "HME: construction"
+    @info "HME: construction..."
 
     test_cases = (
         (1, 0),
@@ -50,7 +50,7 @@
 end;
 
 @testset "HME (function)" begin
-    @info "HME: evaluation"
+    @info "HME: evaluation..."
     test_cases = (
         (1, 0),
         (1, (5,)),
@@ -136,5 +136,5 @@ end;
         @test @ballocated($hme!($dρ, $ρ, $solver_params, $t)) == 0
     end
 
-    @info "HME: done"
+    @info "HME: completed."
 end;

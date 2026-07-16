@@ -1,5 +1,5 @@
 @testset "HOPS" begin
-    @info "HOPS: construction"
+    @info "HOPS: construction..."
 
     test_cases = (
         (1, 0),
@@ -54,7 +54,7 @@ end;
 
 
 @testset "HOPS (function)" begin
-    @info "HOPS: evaluation"
+    @info "HOPS: evaluation..."
 
     test_cases = (
         (1, 0),
@@ -161,5 +161,5 @@ end;
         @test @ballocated($hops!($du, $u, $solver_params, $t)) == 0
     end
 
-    @info "HOPS: done"
+    @info "HOPS: completed."
 end;

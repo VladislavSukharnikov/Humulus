@@ -1,5 +1,5 @@
 @testset "FockSpace" begin
-   @info "FockSpace: construction"
+   @info "FockSpace: construction..."
 
     key_types = (Int16, Int32, Int64)
     ind_types = (Int16, Int32, Int64)
@@ -174,5 +174,5 @@
         @test tuple_space.lower_index == vector_space.lower_index
     end
 
-    @info "FockSpace: done"
+    @info "FockSpace: completed."
 end;

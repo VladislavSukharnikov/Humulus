@@ -1,5 +1,5 @@
 @testset "BCFEigen" begin
-    @info "BCFEigen: construction"
+    @info "BCFEigen: construction..."
 
     test_cases = (
         (1, 100),
@@ -28,12 +28,12 @@
 
         rm(path; force=true)
     end
-    @info "BCFEigen: done"
+    @info "BCFEigen: completed."
 end;
 
 
 @testset "NoiseSampler" begin
-    @info "NoiseSampler: construction"
+    @info "NoiseSampler: construction..."
 
     test_cases = (
         (1, 100),
@@ -63,7 +63,7 @@ end;
 
 
 @testset "NoiseSampler (function)" begin
-    @info "NoiseSampler: evaluation"
+    @info "NoiseSampler: evaluation..."
 
     test_cases = (
         (1, 100),
@@ -122,5 +122,5 @@ end;
 
         @test @ballocated($sampler!($noise)) == 0
     end
-    @info "NoiseSampler: done"
+    @info "NoiseSampler: completed."
 end;

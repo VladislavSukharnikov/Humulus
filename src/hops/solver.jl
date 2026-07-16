@@ -5,22 +5,20 @@
                         solver_params::NamedTuple,
                         n_trajectories::Int,
                         path::String,
+                        show_progress::Bool,
                     ) where {N, MaxFockStates}
     (; dt_max, ts_save) = grid_params
 
     # Create noise sampler.
-    sampler!::NoiseSampler = sampler_from_cache(path, checks=false, clear_cache=false)::NoiseSampler;
+    sampler!::NoiseSampler = sampler_from_cache(path; checks=false, clear_cache=false)::NoiseSampler;
 
     # Container for the physical density matrix
     ρ_s = zeros(ComplexF64, 2, 2, ts_save.n_points)
-    traj_count = zeros(Int, 1)
-
         
     # Create HOPS object for the RHS evaluation.
     time_grid = sampler!._time_grid
     hops! = HOPS{N,MaxFockStates}(time_grid)
 
-    
     # Create ODE problem.
     (; fock_dim, c_g, c_e) = solver_params
     u0    = init_hops(fock_dim, N, c_g, c_e)
@@ -34,6 +32,7 @@
     # Access noise vector from the problem's RHS functor. 
     noise = prob.f.f.noise
 
+    traj_count = 0
     for _ in 1:n_trajectories
         sampler!(noise)
 
@@ -46,18 +45,25 @@
                 progress=true
             )
 
-        traj_count[1] += 1
+        traj_count += 1
 
         for t_idx in 1:ts_save.n_points
             ψ = data.u[t_idx].x[1]
             save_data!(ρ_s, ψ, t_idx)
         end
-        if traj_count[1]%10 == 0
-            println("Finished $(traj_count[1]) trajectories.")
+        
+        # Displaying the progress.
+        if show_progress
+            step = max(1, n_trajectories ÷ 10)  # message every ~10%
+
+            if traj_count % step == 0 || traj_count == n_trajectories
+                percent = round(Int, 100 * traj_count / n_trajectories)
+                @info "Finished $percent% of trajectories."
+            end
         end
     end
 
-    return ArrayPartition(ρ_s, traj_count)
+    return ArrayPartition(ρ_s, [traj_count])
 end
 
 
@@ -71,6 +77,7 @@ function solve_hops(
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int,
                 clear_cache::Bool=true,
+                show_progress::Bool=true,
                 workers::Vector{Int}=[1],
             ) where {N}
 
@@ -85,7 +92,7 @@ function solve_hops(
 
     path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size)
 
-    if workers==[1]
+    if workers==[1] || length(workers)==1 || length(workers)==0
         output = _solve_hops(
                         Val(N), 
                         Val(max_fock_states),  
@@ -93,6 +100,7 @@ function solve_hops(
                         solver_params, 
                         n_trajectories,
                         path,
+                        show_progress,
                     )
     else
         wp = WorkerPool(workers)
@@ -105,6 +113,7 @@ function solve_hops(
                             solver_params,
                             ntraj,
                             path,
+                            show_progress,
                             )
                 end
         output = sum(data_all[:])

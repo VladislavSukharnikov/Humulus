@@ -4,8 +4,6 @@
 
 using Humulus
 
-# clear_noise_cache()
-
 # -----------------------------------------------------------------------------
 # Squeezed reservoir parameters
 # -----------------------------------------------------------------------------
@@ -93,7 +91,7 @@ end
 
 
 
-n_trajectories = 1
+n_trajectories = 1000
 out = @time solve_hops(
     grid_params,
     bcf,
@@ -101,6 +99,7 @@ out = @time solve_hops(
     max_occupancy,
     n_trajectories;
     clear_cache=false,
+    show_progress=true,
 );
 
 # # # # # # # # # # #
@@ -120,6 +119,7 @@ out = @time solve_hops(
     n_trajectories;
     clear_cache=false,
     workers=workers(),
+    show_progress=false,
 );
 
 ρ_s = out.x[2]/out.x[1]

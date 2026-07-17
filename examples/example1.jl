@@ -92,13 +92,13 @@ out = @time solve_hops(
 
 using Distributed
 
-n_workers = Sys.CPU_THREADS
+n_workers = 2#Sys.CPU_THREADS
 addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 1
-out = @time solve_hops(
+n_trajectories = 10000
+out = @time Humulus.solve_hops1(
     grid_params,
     bcf,
     atom_params,

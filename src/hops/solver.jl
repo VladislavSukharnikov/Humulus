@@ -73,14 +73,21 @@ function solve_hops(
                 atom_params::AtomParams,
                 max_occupancies::Union{NTuple{N,Int},Int};
                 n_trajectories::Int=1,
-                noise_oversampling::Int = 2,
+                noise_oversampling::Int=2,
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int,
                 clear_cache::Bool=true,
                 show_progress::Bool=true,
                 workers::Vector{Int}=[1],
             ) where {N}
+    # Input validation.    
+    n_trajectories ≥ 0 || 
+        throw(ArgumentError("n_trajectories must be non-negative, got $n_trajectories"))
 
+    noise_oversampling ≥ 2 || 
+        throw(ArgumentError("noise_oversampling must be at least 2, got $noise_oversampling"))
+
+    # Setting up the computation.
     fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
     solver_params   = create_solver_params(bcf, fock_space, atom_params)
     max_fock_states = maximum(max_occupancies)+1
@@ -139,4 +146,125 @@ function save_data!(ρ_s::Array{ComplexF64,3}, ψ::Array{ComplexF64,2}, t_idx::I
     ρ_s[2,2,t_idx] += abs2(ψ_e)/C₀
     
     return nothing
+end
+
+# # # # #
+function solve_hops(
+    grid_params::GridParams,
+    bcf::BCF{N},
+    atom_params::AtomParams,
+    max_occupancies::Union{NTuple{N,Int},Int};
+    n_trajectories::Int=1,
+    n_batches::Int=1,
+    noise_oversampling::Int=2,
+    KeyType::Type{<:Integer}=Int,
+    IndType::Type{<:Integer}=Int,
+    clear_cache::Bool=true,
+    show_progress::Bool=true,
+    workers::Vector{Int}=[1],
+) where {N}
+
+    n_trajectories ≥ 0 ||
+        throw(ArgumentError("n_trajectories must be non-negative, got $n_trajectories"))
+
+    n_batches > 0 ||
+        throw(ArgumentError("n_batches must be positive, got $n_batches"))
+
+    noise_oversampling ≥ 2 ||
+        throw(ArgumentError("noise_oversampling must be at least 2, got $noise_oversampling"))
+
+    fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
+    solver_params   = create_solver_params(bcf, fock_space, atom_params)
+    max_fock_states = maximum(max_occupancies) + 1
+
+    (; dt_max, ts_save) = grid_params
+    dt_noise  = dt_max / noise_oversampling
+    grid_size = ceil(Int, ts_save.t_end / dt_noise)
+
+    path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size)
+
+    if length(workers) <= 1 || workers == [1]
+
+        output = _solve_hops(
+            Val(N),
+            Val(max_fock_states),
+            grid_params,
+            solver_params,
+            0,
+            path,
+            false,
+        )
+
+        for i in 1:n_batches
+            output += _solve_hops(
+                Val(N),
+                Val(max_fock_states),
+                grid_params,
+                solver_params,
+                n_trajectories,
+                path,
+                show_progress && i == n_batches,
+            )
+        end
+
+    else
+
+        T = typeof(
+            _solve_hops(
+                Val(N),
+                Val(max_fock_states),
+                grid_params,
+                solver_params,
+                0,
+                path,
+                false,
+            )
+        )
+
+        ch = RemoteChannel(() -> Channel{T}(length(workers) * n_batches))
+
+        consumer = @async begin
+            first = take!(ch)
+            total = deepcopy(first)
+
+            for _ in 2:(length(workers) * n_batches)
+                total += take!(ch)
+            end
+
+            total
+        end
+
+        futures = map(workers) do w
+            remotecall(w) do
+                for i in 1:n_batches
+                    partial = _solve_hops(
+                        Val(N),
+                        Val(max_fock_states),
+                        grid_params,
+                        solver_params,
+                        n_trajectories,
+                        path,
+                        show_progress && i == n_batches,
+                    )
+
+                    put!(ch, partial)
+                end
+
+                nothing
+            end
+        end
+
+        foreach(wait, futures)
+
+        close(ch)
+
+        output = fetch(consumer)
+
+    end
+
+    if clear_cache
+        rm(path)
+    end
+
+    return output
 end

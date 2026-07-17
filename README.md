@@ -11,6 +11,11 @@ This implementation accompanies the paper:
 > Physical Review Research (2026).
 > DOI: https://doi.org/10.1103/yt37-s9hz
 
+
+The code solves the dynmamics of a two-level atom driven by non-Markovian environment characterized by the bath-correlation function
+$$
+\alpha(t,s) = \sum_{j=1}^{N} G_j e^{-\Gamma_j |t-s|} f_j(t) g_j^*(s).
+$$
 ---
 
 ## Installation

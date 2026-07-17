@@ -77,7 +77,7 @@ bcf = let
 end
 ```
 
-This creates a BCF functor that can be called as `bcf(t, s)`. The returned object also stores parameters associated with the BCF. For example, `bcf.Γ` contains the decay rates of all effective modes. The number of modes used in contruction is given by `Humulus.n_modes(bcf)`. Another available public constructor is `three_mode_squeezed_bcf`.
+This creates a BCF functor that can be called as `bcf(t, s)`. The returned object also stores parameters associated with the BCF. For example, `bcf.Γ` contains the decay rates of all effective modes. Another available public constructor is `three_mode_squeezed_bcf`.
 
 The second required object specifies the atomic parameters. The current implementation supports only a two-level atom. The atomic parameters consist of the resonance frequency and the initial pure state:
 
@@ -127,7 +127,9 @@ $$
 $$
 
 
-Now the non-markovian problem can be solved in one of two ways.
+Now the non-Markovian problem can be solved in one of two ways.
+
+### Solving HME
 
 To solve the hierarchy of master equations (HME), run
 
@@ -141,6 +143,8 @@ To solve the hierarchy of master equations (HME), run
 ```
 
 This returns the reduced system density matrix `ρ_s` with dimensions `ρ_s[i, j, t]`, where `i` and `j` label the atomic states (ground and excited), and `t` indexes the saved time points.
+
+### Solving HOPS
 
 Alternatively, the hierarchy of pure states (HOPS) can be solved by specifying the number of trajectories:
 
@@ -158,7 +162,7 @@ out = solve_hops(
 )
 ```
 
-The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data are deleted after the computation completes. By default, `clear_cache=true`.
+The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data is deleted after the computation completes. By default, `clear_cache=true`.
 
 The cache is intended primarily for distributed computations. In such settings, sending large eigendecomposition matrices to workers causes significant serialization overhead. Instead, the eigendecomposition is stored in a `.jld2` file, which each worker can load independently. This approach is designed for computational clusters with a shared filesystem, such as the DESY Maxwell Cluster.
 

@@ -1,20 +1,24 @@
 # Humulus.jl
 
-**Humulus** is a Julia implementation of the **Hierarchy of Pure States (HOPS)** method for simulating non-Markovian open quantum systems interacting with nonstationary Gaussian reservoirs. The name comes from *Humulus lupulus*, Latin for “hops.”
+**Humulus** is a Julia implementation of the **Hierarchy of Pure States (HOPS)** method for simulating non-Markovian open quantum systems interacting with nonstationary Gaussian reservoirs, characterized by the bath-correlation function of the form
+
+$$
+\alpha(t,s) = \sum_{j=1}^{N} G_j^2 e^{-\Gamma_j |t-s|} f_j(t) g_j^*(s).
+$$
+
+The name comes from *Humulus lupulus*, Latin for “hops.”
 
 The repository currently contains implementations of **HOPS** and the associated **Hierarchy of Master Equations (HME)** for a two-level atom coupled to a squeezed reservoir.
 
-The code solves the dynmamics of a two-level atom driven by non-Markovian environment characterized by the bath-correlation function
-$$
-\alpha(t,s) = \sum_{j=1}^{N} G_j e^{-\Gamma_j |t-s|} f_j(t) g_j^*(s).
-$$
 
-This implementation accompanies the paper:
+This implementation accompanies the open-access paper:
 
 > V. Sukharnikov, S. Chuchurka, and F. Schlawin,
 > *Non-Markovian dynamics in Nonstationary Gaussian Baths: A Hierarchy of Pure States Approach*,
 > Physical Review Research (2026).
 > DOI: https://doi.org/10.1103/yt37-s9hz
+
+
 
 ---
 
@@ -73,7 +77,7 @@ bcf = let
 end
 ```
 
-This creates a BCF functor that can be called as `bcf(t, s)`. The returned object also stores parameters associated with the BCF. For example, `bcf.Γ` contains the decay rates of all effective modes. The number of modes used in contruction is given by `Humulus.n_modes(bcf)`. Another available public constructor is `three_mode_squeezed_bcf`.
+This creates a BCF functor that can be called as `bcf(t, s)`. The returned object also stores parameters associated with the BCF. For example, `bcf.Γ` contains the decay rates of all effective modes. Another available public constructor is `three_mode_squeezed_bcf`.
 
 The second required object specifies the atomic parameters. The current implementation supports only a two-level atom. The atomic parameters consist of the resonance frequency and the initial pure state:
 
@@ -123,7 +127,9 @@ $$
 $$
 
 
-Now the non-markovian problem can be solved in one of two ways.
+Now the non-Markovian problem can be solved in one of two ways.
+
+### Solving HME
 
 To solve the hierarchy of master equations (HME), run
 
@@ -137,6 +143,8 @@ To solve the hierarchy of master equations (HME), run
 ```
 
 This returns the reduced system density matrix `ρ_s` with dimensions `ρ_s[i, j, t]`, where `i` and `j` label the atomic states (ground and excited), and `t` indexes the saved time points.
+
+### Solving HOPS
 
 Alternatively, the hierarchy of pure states (HOPS) can be solved by specifying the number of trajectories:
 
@@ -154,7 +162,7 @@ out = solve_hops(
 )
 ```
 
-The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data are deleted after the computation completes. By default, `clear_cache=true`.
+The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data is deleted after the computation completes. By default, `clear_cache=true`.
 
 The cache is intended primarily for distributed computations. In such settings, sending large eigendecomposition matrices to workers causes significant serialization overhead. Instead, the eigendecomposition is stored in a `.jld2` file, which each worker can load independently. This approach is designed for computational clusters with a shared filesystem, such as the DESY Maxwell Cluster.
 

@@ -5,6 +5,7 @@
 The repository currently contains implementations of **HOPS** and the associated **Hierarchy of Master Equations (HME)** for a two-level atom coupled to a squeezed reservoir.
 
 The code solves the dynmamics of a two-level atom driven by non-Markovian environment characterized by the bath-correlation function
+
 $$
 \alpha(t,s) = \sum_{j=1}^{N} G_j e^{-\Gamma_j |t-s|} f_j(t) g_j^*(s).
 $$

@@ -11,7 +11,7 @@ The name comes from *Humulus lupulus*, Latin for “hops.”
 The repository currently contains implementations of **HOPS** and the associated **Hierarchy of Master Equations (HME)** for a two-level atom coupled to a squeezed reservoir.
 
 
-This implementation accompanies the paper:
+This implementation accompanies the open-access paper:
 
 > V. Sukharnikov, S. Chuchurka, and F. Schlawin,
 > *Non-Markovian dynamics in Nonstationary Gaussian Baths: A Hierarchy of Pure States Approach*,

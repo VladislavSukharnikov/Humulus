@@ -73,13 +73,13 @@ max_occupancy = 50
 # Running HOPS on the main process. 
 # -----------------------------------------------------------------------------
 
-n_trajectories = 100
+n_trajectories = 1
 out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
-    max_occupancy,
-    n_trajectories;
+    max_occupancy;
+    n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
 );
@@ -97,13 +97,13 @@ addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 100
+n_trajectories = 1
 out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
-    max_occupancy,
-    n_trajectories;
+    max_occupancy;
+    n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
     workers=workers(),

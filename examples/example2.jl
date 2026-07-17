@@ -68,8 +68,8 @@ out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
-    max_occupancy,
-    n_trajectories,
+    max_occupancy;
+    n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
 );
@@ -93,8 +93,8 @@ out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
-    max_occupancy,
-    n_trajectories;
+    max_occupancy;
+    n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
     workers=workers(),

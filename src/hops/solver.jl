@@ -71,8 +71,8 @@ function solve_hops(
                 grid_params::GridParams,
                 bcf::BCF{N}, 
                 atom_params::AtomParams,
-                max_occupancies::Union{NTuple{N,Int},Int},
-                n_trajectories::Int;
+                max_occupancies::Union{NTuple{N,Int},Int};
+                n_trajectories::Int=1,
                 noise_oversampling::Int = 2,
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int,

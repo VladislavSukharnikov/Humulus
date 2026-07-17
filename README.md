@@ -24,16 +24,14 @@ This implementation accompanies the open-access paper:
 
 ## Installation
 
-### Install with Julia's package manager
+Install with Julia's package manager:
 
 ```julia
 using Pkg
 Pkg.add(url="https://github.com/VladislavSukharnikov/Humulus")
 ```
 
-### Install from a local clone
-
-Clone the repository:
+Alternatively, install from a local clone by cloning the repository:
 
 ```bash
 git clone https://github.com/VladislavSukharnikov/Humulus.git

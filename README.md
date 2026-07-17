@@ -209,7 +209,7 @@ If you use this software in academic work, please cite
 ```bibtex
 @article{sukharnikov2026,
   author = {Sukharnikov, Vladislav and Chuchurka, Stasis and Schlawin, Frank},
-  title = {Non-Markovian dynamics in Nonstationary Gaussian Baths: A Hierarchy of Pure States Approach},
+  title = {{Non-Markovian dynamics in Nonstationary Gaussian Baths: A Hierarchy of Pure States Approach}},
   journal = {Physical Review Research},
   year = {2026},
   doi = {10.1103/yt37-s9hz}

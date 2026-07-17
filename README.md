@@ -15,9 +15,32 @@ This implementation accompanies the paper:
 
 ## Installation
 
+### Install with Julia's package manager
+
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/VladislavSukharnikov/Humulus.jl")
+Pkg.add(url="https://github.com/VladislavSukharnikov/Humulus")
+```
+
+### Install from a local clone
+
+Clone the repository:
+
+```bash
+git clone https://github.com/VladislavSukharnikov/Humulus.git
+cd Humulus
+```
+
+Then start Julia with the project environment and install the dependencies:
+
+```bash
+julia --project=.
+```
+
+```julia
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
 ```
 
 ---

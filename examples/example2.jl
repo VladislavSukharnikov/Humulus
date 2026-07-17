@@ -44,8 +44,8 @@ end
 
 grid_params = let
     t_end    = 20.0   # final simulation time
-    n_save   = 500    # number of intervals between saved time points
-    substeps = 2     # maximum internal integration substeps per save interval
+    n_save   = 250    # number of intervals between saved time points
+    substeps = 4      # maximum internal integration substeps per save interval
     @info "Expected minimal number of steps is $(n_save*substeps)."
     GridParams(t_end, n_save, substeps)
 end
@@ -60,10 +60,10 @@ max_occupancy = 10
 
 
 # -----------------------------------------------------------------------------
-# Sample trajectories.
+# Running HOPS on the main process. 
 # -----------------------------------------------------------------------------
 
-n_trajectories = 1
+n_trajectories = 10
 out = @time solve_hops(
     grid_params,
     bcf,
@@ -74,19 +74,21 @@ out = @time solve_hops(
     show_progress=true,
 );
 
-# -----------------------------------------------------------------------------
-# Sample trajectories.
-# -----------------------------------------------------------------------------
+ρ_s = out.x[1]./out.x[2]
 
-# # # # # # # # # # #
+
+# -----------------------------------------------------------------------------
+# Distributed computation of HOPS.
+# -----------------------------------------------------------------------------
 
 using Distributed
 
-addprocs(5)
+n_workers = Sys.CPU_THREADS
+addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 100
+n_trajectories = 1
 out = @time solve_hops(
     grid_params,
     bcf,
@@ -101,4 +103,4 @@ out = @time solve_hops(
 ρ_s = out.x[1]./out.x[2]
 
 @info "Expected number of trajectories: $(n_trajectories*length(workers())) "
-@info "Total number of trajectories: $(out.x[2][1])"
+@info "Actual number of trajectories: $(out.x[2][1])"

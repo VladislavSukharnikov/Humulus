@@ -70,28 +70,10 @@ max_occupancy = 50
 
 
 # -----------------------------------------------------------------------------
-# Plotting mean Bloch vector components. 
+# Running HOPS on the main process. 
 # -----------------------------------------------------------------------------
 
-using Plots
-
-let ts_save=grid_params.ts_save
-    σˣ, σʸ, σᶻ = bloch_vector(ρ_s)
-
-    p1 = plot(ts_save, real(σˣ), ylims=(-1,1), xlabel="Time", label = "x");
-    p2 = plot(ts_save, real(σʸ), ylims=(-1,1), xlabel="Time", label = "y");
-    p3 = plot(ts_save, real(σᶻ), ylims=(-0.4,0), xlabel="Time", label = "z");
-
-    plot(p1, p2, p3, layout=(3, 1), size=(700, 800), plot_title="Mean Bloch vector components.")
-end
-
-
-
-# # # # # # # # # # #
-
-
-
-n_trajectories = 1000
+n_trajectories = 100
 out = @time solve_hops(
     grid_params,
     bcf,
@@ -102,11 +84,16 @@ out = @time solve_hops(
     show_progress=true,
 );
 
-# # # # # # # # # # #
+ρ_s = out.x[1]./out.x[2];
+
+# -----------------------------------------------------------------------------
+# Distributed computation of HOPS.
+# -----------------------------------------------------------------------------
 
 using Distributed
 
-addprocs(5)
+n_workers = Sys.CPU_THREADS
+addprocs(n_workers)
 
 @everywhere using Humulus
 
@@ -118,11 +105,11 @@ out = @time solve_hops(
     max_occupancy,
     n_trajectories;
     clear_cache=false,
-    show_progress=false,
+    show_progress=true,
     workers=workers(),
 );
 
 ρ_s = out.x[1]./out.x[2]
 
 @info "Expected number of trajectories: $(n_trajectories*length(workers())) "
-@info "Total number of trajectories: $(out.x[2][1])"
+@info "Actual number of trajectories: $(out.x[2][1])"

@@ -5,31 +5,39 @@
 """
     FuncWrapper{F,P} <: Function
 
-Callable object storing a function together with its parameters.
+Callable object that stores a function together with a tuple of parameters.
+
+Calling `FuncWrapper(f, params)(t)` is equivalent to
+
+    f(t, params...)
 
 # Type parameters
-- `F`: wrapped callable type.
-- `P`: tuple type of the stored parameters.
+- `F`: type of the wrapped callable.
+- `P`: type of the stored parameter tuple.
 
 # Fields
 - `f`: wrapped callable.
-- `params`: stored parameter tuple.
+- `params`: tuple of stored parameters.
 """
 struct FuncWrapper{F,P}<:Function
     f::F
     params::P
 end
 
+# Evaluate the wrapped function using the stored parameters.
 @inline (func::FuncWrapper)(t::Float64) = func.f(t, func.params...)
 
+# Value equality.
 Base.:(==)(x::FuncWrapper, y::FuncWrapper) =
     x.f == y.f &&
     x.params == y.params
 
+# Exact equality.
 Base.isequal(x::FuncWrapper, y::FuncWrapper) =
     isequal(x.f, y.f) &&
     isequal(x.params, y.params)
 
+    
 # =============================================================================
 # Bath-correlation function. 
 # =============================================================================
@@ -37,21 +45,21 @@ Base.isequal(x::FuncWrapper, y::FuncWrapper) =
 """
     BCF{N,FVector,GVector} <: Function
 
-Bath correlation function represented as a finite sum of exponentially
+Callable bath-correlation function represented as a finite sum of exponentially
 decaying modes,
 
 ```math
-\\alpha(t,s) = \\sum_j G_j^2 f_j(t) g^*_j(s) e^{-\\Gamma_j |t-s|}.
+\\alpha(t,s) = \\sum_j G_j^2 f_j(t) g_j^*(s) e^{-\\Gamma_j |t-s|}.
 ```
 
 # Type parameters
 - `N`: number of modes.
-- `FVector`: static vector of functions `fⱼ(t)`.
-- `GVector`: static vector of functions `gⱼ(s)`.
+- `FVector`: static vector of `FuncWrapper`s representing the functions `fⱼ(t)`.
+- `GVector`: static vector of `FuncWrapper`s representing the functions `gⱼ(s)`.
 
 # Fields
-- `Γ`: decay rates.
-- `G`: coupling amplitudes.
+- `Γ`: mode decay rates.
+- `G`: mode coupling amplitudes.
 - `f_vector`: functions `fⱼ(t)`.
 - `g_vector`: functions `gⱼ(s)`.
 """
@@ -96,16 +104,13 @@ Base.isequal(x::BCF, y::BCF) =
 # =============================================================================
 
 """
-    (bcf::BCF)(t, s) -> ComplexF64
+    (bcf::BCF)(t, s)
 
-Evaluate the bath-correlation function.
+Evaluate the bath correlation function at the times `t` and `s`.
 
 # Arguments
-- `t`: first time.
-- `s`: second time.
-
-# Returns
-- Value of the bath-correlation function at `(t, s)`.
+- `t::Float64`: first time.
+- `s::Float64`: second time.
 """
 function (bcf::BCF{N})(
                     t::Float64, 

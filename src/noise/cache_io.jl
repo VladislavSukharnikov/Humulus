@@ -1,26 +1,26 @@
 """
-    sampler_from_cache(path::String; checks=true) -> NoiseSampler
+    sampler_from_cache(path; checks=true, clear_cache=false)
 
-Load precomputed noise data from `path`.
+Load a precomputed bath-correlation-function (BCF) eigendecomposition from
+`path` and construct a `NoiseSampler`.
 
 The file must contain a serialized `BCFEigen` object. When `checks=true`
 (the default), the loaded data are validated before constructing the
-returned `NoiseSampler`.
+returned sampler.
 
 # Arguments
-- `path`: path to a serialized `BCFEigen` object.
+- `path::String`: path to a serialized `BCFEigen` object.
 
 # Keyword arguments
-- `checks`: whether to validate the loaded data before constructing the
-  noise generator.
+- `checks::Bool`: whether to validate the loaded data.
+- `clear_cache::Bool`: whether to remove the cache file after loading it.
 
-# Returns
-- `NoiseSampler`: noise generator initialized from the stored time grid,
-  eigenvectors, and square roots of the BCF kernel eigenvalues.
+# Exceptions
 
-# Throws
-- An exception if the file cannot be read.
-- `AssertionError` if `checks=true` and the loaded data are invalid.
+An exception is thrown if
+
+- the cache file cannot be read;
+- `checks=true` and the loaded data are invalid.
 """
 function sampler_from_cache(
                 path::String; 
@@ -30,15 +30,16 @@ function sampler_from_cache(
 
     @assert isfile(path) "Cache file does not exist: $path"
 
-    # Load precomputed noise parameters from disk.
+    # Load precomputed data from disk.
     bcf_eigen::BCFEigen = load_object(path)::BCFEigen
     if clear_cache
         rm(path)
     end
 
-    # Extract the stored eigendecomposition of the BCF.
+    # Extract the stored bath correlation matrix eigendecomposition.
     (; time_grid, vals, vecs) = bcf_eigen
     n_points = time_grid.n_points
+
     if checks
         @assert length(vals) == n_points "Expected $n_points eigenvalues."
         @assert size(vecs) == (n_points, n_points) "Expected a $n_points × $n_points eigenvector matrix."
@@ -58,9 +59,9 @@ end
 
 
 """
-    get_bcf_eigen_cache(bcf, t_end, grid_size) -> String
+    get_bcf_eigen_cache(bcf, t_end, grid_size)
 
-Create or reuse a cached `BCFEigen` object.
+Return the path to a cached `BCFEigen` object.
 
 The cache is identified by the bath correlation function, the final time,
 and the discretization grid size. If a matching cache file already exists,
@@ -70,15 +71,12 @@ saved to disk, and its path is returned.
 Cache files are stored in the `bcf_eigen_cache` directory.
 
 # Arguments
-- `bcf`: bath correlation function.
-- `t_end`: final time of the discretization interval.
-- `grid_size`: number of discretization points.
-
-# Returns
-- `String`: path to the cache file containing the corresponding
-  `BCFEigen` object.
+- `bcf::BCF`: bath correlation function.
+- `t_end::Float64`: final time of the discretization interval.
+- `grid_size::Int`: number of discretization points.
 
 # Notes
+
 An existing cache file is reused only if its contents are consistent with
 the requested parameters. Otherwise, it is replaced with a newly generated
 cache.
@@ -118,7 +116,7 @@ function get_bcf_eigen_cache(
         @info "No existing cache found. Building a new one."
     end
 
-    @info "Computing the eigendecomposition of a $grid_size × $grid_size matrix."
+    @info "Computing the eigendecomposition of the discretized bath correlation matrix ($grid_size × $grid_size)."
     bcf_eigen = BCFEigen(bcf, t_end, grid_size)
     save_object(path, bcf_eigen)
     @info "Eigendecomposition completed. Results saved to \"$path\"."
@@ -127,10 +125,18 @@ function get_bcf_eigen_cache(
 end
 
 
+"""
+    clear_bcf_eigen_cache()
+
+Remove all cached `BCFEigen` objects.
+
+If the cache directory does not exist, the function does nothing.
+"""
 function clear_bcf_eigen_cache()
     dir = "bcf_eigen_cache"
     isdir(dir) || return
 
+    # Remove all cached eigendecompositions.
     for entry in readdir(dir; join=true)
         rm(entry; recursive=true, force=true)
     end

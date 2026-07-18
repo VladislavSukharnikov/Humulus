@@ -97,8 +97,8 @@ addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 10000
-out = @time Humulus.solve_hops1(
+n_trajectories = 1
+out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,

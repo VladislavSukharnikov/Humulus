@@ -13,16 +13,16 @@
     )
 
 Populate `basis_states` and `state_to_index` with the basis of an `N`-mode
-truncated Fock space.
+Fock space truncated by per-mode occupation cutoffs.
 
-Each basis state is an `SVector{N,KeyType}` whose occupations satisfy
+Each basis state is an `SVector{N,KeyType}` satisfying
 `0 ≤ nᵢ ≤ max_occupancies[i]` for `i = 1, …, N`.
 
-The basis is generated in lexicographic order by `Iterators.product`.
-`basis_states` stores the basis states, and `state_to_index` maps each
+The basis is generated in lexicographic order using `Iterators.product`.
+`basis_states` stores the basis states, while `state_to_index` maps each
 basis state to its corresponding 1-based index.
 
-This function mutates `basis_states` and `state_to_index` and returns
+This function mutates `state_to_index` and `basis_states` and returns
 `nothing`.
 """
 function build_basis!(
@@ -46,11 +46,30 @@ end
 
 
 """
+    build_basis!(
+        state_to_index,
+        basis_states,
+        Val(N),
+        max_occupancies,
+        KeyType,
+        IndType,
+    )
+
 Populate `basis_states` and `state_to_index` with the basis of an `N`-mode
 Fock space truncated by a global occupation-number cutoff.
 
-Only basis states whose total occupation number does not exceed
-`max_occupancies` are included.
+Only basis states satisfying
+
+    ∑ᵢ nᵢ ≤ max_occupancies
+
+are included.
+
+The basis is generated in lexicographic order using `Iterators.product`.
+`basis_states` stores the basis states, while `state_to_index` maps each
+basis state to its corresponding 1-based index.
+
+This function mutates `state_to_index` and `basis_states` and returns
+`nothing`.
 """
 function build_basis!(
                     state_to_index::Dict{SVector{N,KeyType},IndType},
@@ -82,10 +101,18 @@ end
     neighbor_index(state_to_index, state, mode, occupation_shift)
 
 Return the basis index of the state obtained by shifting the occupation
-number of `mode` by `occupation_shift`.
+number of `state` in `mode` by `occupation_shift`.
 
-Returns zero if the resulting state is not contained in the truncated
-Fock-space basis.
+# Arguments
+- `state_to_index`: mapping from basis states to basis indices.
+- `state`: occupation-number state.
+- `mode`: mode whose occupation number is modified.
+- `occupation_shift`: change in the occupation number.
+
+# Returns
+
+Returns the corresponding basis index, or zero if the resulting state is
+not contained in the truncated Fock-space basis.
 """
 @inline function neighbor_index(
                         state_to_index::Dict{SVector{N,KeyType},IndType}, 

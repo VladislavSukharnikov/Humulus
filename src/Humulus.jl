@@ -5,18 +5,18 @@ module Humulus
     # =============================================================================
 
     # Differential equation solver
-    using OrdinaryDiffEq
+    using OrdinaryDiffEq: ODEProblem, ODEFunction, solve, Tsit5
 
     # Data structures and utilities
-    using StaticArrays
-    using RecursiveArrayTools
-    using LinearAlgebra
+    using StaticArrays: SVector, MVector, setindex
+    using RecursiveArrayTools: ArrayPartition
+    using LinearAlgebra: mul!, eigen!, Hermitian
 
     # Input/output/caching
-    using JLD2
+    using JLD2: save_object, load_object
 
     # Parallel computation
-    using Distributed
+    using Distributed: addprocs, rmprocs, pmap, WorkerPool
 
 
     # =============================================================================
@@ -39,8 +39,8 @@ module Humulus
     include("fock/constructors.jl")
     include("fock/basis.jl")
 
-    include("time_grid.jl")
     
+    include("params/time_grid.jl")
     include("params/atom_params.jl")
     include("params/grid_params.jl")
     include("params/solver_params.jl")

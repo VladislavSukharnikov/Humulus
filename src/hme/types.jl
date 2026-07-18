@@ -29,9 +29,17 @@ end
 """
     HME{N,MaxFockStates}()
 
-Construct an `HME` functor for an `N`-mode system.
+Construct and return an `HME` functor for an `N`-mode system.
 
 `MaxFockStates` specifies the maximum number of retained Fock states per mode.
+
+# Exceptions
+
+An exception is thrown if
+
+- `N` or `MaxFockStates` is not an integer;
+- `N ≤ 0`; or
+- `MaxFockStates < 1`.
 """
 function HME{N,MaxFockStates}() where {N,MaxFockStates}
 

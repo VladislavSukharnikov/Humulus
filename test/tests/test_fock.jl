@@ -25,7 +25,7 @@
     )
 
     @testset "$title" for (title, N, N_val, max_occupancies, KeyType, IndType) in test_cases
-        fock_space = FockSpace(N_val, max_occupancies, KeyType, IndType)
+        fock_space = FockSpace(N_val, max_occupancies, KeyType=KeyType, IndType=IndType)
 
         if max_occupancies isa Integer
             expected_dim = binomial(big(max_occupancies+N),N)
@@ -141,33 +141,33 @@
         @test_throws MethodError FockSpace(Val(-2), (1, 5))
         @test_throws MethodError FockSpace(Val(0.1), (1, 5))
         @test_throws MethodError FockSpace(Val(0im), (1, 5))
-        @test_throws MethodError FockSpace(Val(2), (5, 5, 5), Int16, Int32)
-        @test_throws MethodError FockSpace(Val(2), [0.1, 0.2], Int16, Int32)
+        @test_throws MethodError FockSpace(Val(2), (5, 5, 5), KeyType=Int16, IndType=Int32)
+        @test_throws MethodError FockSpace(Val(2), [0.1, 0.2], KeyType=Int16, IndType=Int32)
 
         @test_throws DomainError FockSpace(Val(0), 10)
         @test_throws DomainError FockSpace(Val(2), (-1, 5))
         @test_throws DomainError FockSpace(Val(2), [-1, 5])
-        @test_throws DimensionMismatch FockSpace(Val(2), [5], Int16, Int32)
-        @test_throws DimensionMismatch FockSpace(Val(2), [5,5,5], Int16, Int32)
-        @test_throws DimensionMismatch FockSpace(Val(2), [5], Int16, Int32)
-        @test_throws ArgumentError FockSpace(Val(1), 200, Int8, Int8)
-        @test_throws ArgumentError FockSpace(Val(1), 200, Int, Int8)
-        @test_throws ArgumentError FockSpace(Val(1), 200, Int8, Int)
+        @test_throws DimensionMismatch FockSpace(Val(2), [5], KeyType=Int16, IndType=Int32)
+        @test_throws DimensionMismatch FockSpace(Val(2), [5,5,5], KeyType=Int16, IndType=Int32)
+        @test_throws DimensionMismatch FockSpace(Val(2), [5], KeyType=Int16, IndType=Int32)
+        @test_throws ArgumentError FockSpace(Val(1), 200, KeyType=Int8, IndType=Int8)
+        @test_throws ArgumentError FockSpace(Val(1), 200, KeyType=Int, IndType=Int8)
+        @test_throws ArgumentError FockSpace(Val(1), 200, KeyType=Int8, IndType=Int)
     end
 
     @testset "Zero occupancy" begin
-        fock_space = FockSpace(Val(2), (0, 0), Int16, Int16)
+        fock_space = FockSpace(Val(2), (0, 0), KeyType=Int8, IndType=Int8)
 
         @test fock_space.fock_dim == 1
-        @test fock_space.basis_states == [SVector{2,Int16}(0, 0)]
+        @test fock_space.basis_states == [SVector{2,Int8}(0, 0)]
         @test length(fock_space.state_to_index) == 1
         @test size(fock_space.raise_index) == (2, 1)
         @test size(fock_space.lower_index) == (2, 1)
     end
 
     @testset "Equivalent occupancy inputs" begin
-        tuple_space  = FockSpace(Val(2), (5, 5), Int16, Int32)
-        vector_space = FockSpace(Val(2), [5, 5], Int16, Int32)
+        tuple_space  = FockSpace(Val(2), (5, 5), KeyType=Int16, IndType=Int32)
+        vector_space = FockSpace(Val(2), [5, 5], KeyType=Int16, IndType=Int32)
 
         @test tuple_space.basis_states == vector_space.basis_states
         @test tuple_space.raise_index == vector_space.raise_index

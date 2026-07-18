@@ -17,12 +17,12 @@ neighbor indices for creation and annihilation operators.
 - `IndType`: integer type used to store basis indices.
 
 # Fields
-- `max_occupancies`: occupation-number truncation.
-- `state_to_index`: mapping from basis states to basis indices.
-- `basis_states`: basis states ordered by index.
+- `max_occupancies`: maximum occupation number for each mode.
+- `state_to_index`: mapping from occupation-number states to basis indices.
+- `basis_states`: basis states ordered by basis index.
 - `fock_dim`: dimension of the truncated Fock space.
-- `raise_index`: indices of neighboring states reached by applying a creation operator.
-- `lower_index`: indices of neighboring states reached by applying an annihilation operator.
+- `raise_index`: basis indices of states reached by applying a creation operator.
+- `lower_index`: basis indices of states reached by applying an annihilation operator.
 """
 struct FockSpace{N,KeyType<:Integer,IndType<:Integer}
     max_occupancies :: Union{Int,NTuple{N,Int}}

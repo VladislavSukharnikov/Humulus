@@ -8,7 +8,13 @@ The physical density matrix is initialized to the pure atomic state
 ```math
 |ψ⟩ = c_g |g⟩ + c_e |e⟩,
 ```
+
 while all auxiliary density operators are initialized to zero.
+
+# Arguments
+- `ρ`: hierarchy state.
+- `c_g`: ground-state amplitude.
+- `c_e`: excited-state amplitude.
 """
 function init_hme!(ρ::AbstractArray{ComplexF64,4}, c_g::T, c_e::T) where {T<:Number}
     # Clear all entries before writing the initial state.
@@ -31,9 +37,13 @@ Allocate and initialize the HME hierarchy.
 The physical density matrix is initialized to the pure atomic state
 specified by `c_g` and `c_e`, while all auxiliary density operators are
 initialized to zero.
+
+# Arguments
+- `fock_dim`: dimension of the pseudo-Fock space.
+- `c_g`: ground-state amplitude.
+- `c_e`: excited-state amplitude.
 """
 function init_hme(fock_dim::Int, c_g::T, c_e::T) where {T<:Number}
-
     # Allocate the density matrix and initialize it in place.
     u0 = zeros(ComplexF64, 2, 2, fock_dim, fock_dim)
     init_hme!(u0, c_g, c_e)

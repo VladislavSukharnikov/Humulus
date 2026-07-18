@@ -1,40 +1,45 @@
 """
     BCFEigen(bcf, t_end, grid_size)
 
-Construct a `BCFEigen` object from a bath-correlation function (BCF).
+Construct and return the eigendecomposition of a discretized bath
+correlation function (BCF).
 
-The BCF is discretized on a uniform time grid, and the eigendecomposition
-of the resulting kernel matrix is computed. The returned object stores the
-time grid together with the eigendecomposition, which can be saved and
-later reused for efficient noise generation.
+The BCF is evaluated on a uniform time grid to form the corresponding bath
+correlation matrix. The returned object stores the time grid together with
+the eigendecomposition of this matrix, which can be saved and later reused
+for efficient noise generation.
 
 # Arguments
-- `bcf`: bath-correlation function.
-- `t_end`: final time of the discretization interval.
-- `grid_size`: number of discretization points.
-
-# Returns
-- `BCFEigen`: precomputed eigendecomposition of the discretized BCF.
+- `bcf::BCF`: bath correlation function.
+- `t_end::Float64`: final time of the discretization interval.
+- `grid_size::Int`: number of discretization points.
 """
 function BCFEigen(
                 bcf::BCF, 
                 t_end::Float64, 
                 grid_size::Int,
             )
-        
+
+    # Input validation.    
+    grid_size >= 1 ||
+        throw(ArgumentError("`grid_size` must be at least 1, got $grid_size."))
+
+    t_end > 0.0 ||
+        throw(ArgumentError("`t_end` must be positive, got $t_end."))
+
     # Construct the discretization grid.
     time_grid = TimeGrid(0.0, t_end, grid_size)
 
-    # Assemble the discretized BCF kernel matrix.
+    # Assemble the discretized bath correlation matrix.
     bcf_matrix = Matrix{ComplexF64}(undef, grid_size, grid_size)
     @inbounds for t in 1:grid_size, s in 1:grid_size
         bcf_matrix[t,s] = bcf(time_grid[t], time_grid[s])
     end
 
-    # Compute the eigendecomposition of the BCF kernel.
+    # Compute the eigendecomposition of the discretized bath correlation matrix.
     vals, vecs = eigen!(Hermitian(bcf_matrix))
 
-    # Warn if the kernel is not positive semidefinite.
+    # Warn if the matrix is not positive semidefinite.
     if any(vals .< 0.0)
         @warn "Negative eigenvalue detected."
     end

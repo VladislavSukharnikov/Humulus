@@ -3,24 +3,28 @@
 # =============================================================================
 
 """
-    three_mode_squeezed_bcf(ω₀, Γ₀, κ, ϵ, φ, γ) -> BCF
+    three_mode_squeezed_bcf(ω₀, Γ₀, κ, ϵ, φ, γ)
 
-Construct the three-mode effective bath correlation function (BCF) describing the
-output field of a degenerate parametric amplifier (DPA).
+Construct and return a three-mode effective bath-correlation function (BCF)
+describing the output field of a degenerate parametric amplifier (DPA).
 
 # Arguments
-- `ω₀::Float64`: output central frequency.
-- `Γ₀::Float64`: input Lorentzian width.
+- `ω₀::Float64`: central output frequency.
+- `Γ₀::Float64`: input linewidth.
 - `κ::Float64`: cavity loss rate.
-- `ϵ::Float64`: effective DPA pump amplitude.
-- `φ::Float64`: effective squeezing phase.
+- `ϵ::Float64`: effective pump amplitude.
+- `φ::Float64`: squeezing phase.
 - `γ::Float64`: system–field coupling strength.
 
 # Physical constraints
+
 The parameters must satisfy
-- `κ > ϵ` (stable DPA),
-- `Γ₀ > κ + ϵ` (the input bandwidth is the largest linewidth),
-- all rates and couplings are non-negative.
+
+- `Γ₀ ≥ 0`, `κ ≥ 0`, `ϵ ≥ 0`, and `γ ≥ 0`;
+- `κ > ϵ` (stable DPA);
+- `Γ₀ > κ + ϵ` (the input bandwidth exceeds all effective linewidths).
+
+If any of these conditions are violated, an exception is thrown.
 """
 function three_mode_squeezed_bcf(
                             ω₀::Float64, 
@@ -84,23 +88,29 @@ end
 
 
 """
-    one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ) -> BCF
+    one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ)
 
-Construct the bath correlation function (BCF) for a single-mode squeezed reservoir.
+Construct and return the bath-correlation function (BCF) for a single-mode
+squeezed reservoir.
 
-The resulting BCF consists of a single pseudo-mode with central frequency
-`ω₀`, spectral half-width `Γ`, and effective coupling strength determined by
-`γ`. The squeezing is characterized by the parameter `r` and phase `φ`.
+The resulting BCF consists of a single pseudo-mode with central frequency `ω₀`,
+spectral half-width `Γ`, and effective coupling strength determined by `γ`. The
+squeezing is characterized by the parameter `r` and phase `φ`.
 
 # Arguments
-- `ω₀::Float64`: central frequency of the reservoir.
+- `ω₀::Float64`: central reservoir frequency.
 - `Γ::Float64`: spectral half-width (memory decay rate).
 - `r::Float64`: squeezing parameter.
 - `φ::Float64`: squeezing phase.
-- `γ::Float64`: atom–field coupling strength.
+- `γ::Float64`: system–field coupling strength.
 
-# Returns
-- `BCF`: bath correlation function representing a one-mode squeezed reservoir.
+# Physical constraints
+
+The parameters must satisfy
+
+- `Γ ≥ 0`, `r ≥ 0`, and `γ ≥ 0`.
+
+If this condition is violated, an exception is thrown.
 """
 function one_mode_squeezed_bcf(
                         ω₀::Float64, 

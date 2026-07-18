@@ -5,7 +5,7 @@
 """
     AtomParams
 
-Atomic parameters.
+Parameters describing the two-level atom.
 
 The initial atomic state is
 
@@ -14,9 +14,9 @@ The initial atomic state is
 ```
 
 # Fields
-- `ν₀::Float64`: atomic transition frequency.
-- `c_g::ComplexF64`: ground-state amplitude.
-- `c_e::ComplexF64`: excited-state amplitude.
+- `ν₀::Float64`: Atomic transition frequency.
+- `c_g::ComplexF64`: Initial amplitude of the ground state.
+- `c_e::ComplexF64`: Initial amplitude of the excited state.
 """
 struct AtomParams
     ν₀::Float64

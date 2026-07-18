@@ -1,12 +1,17 @@
 """
-    (sample_noise::NoiseSampler)(noise)
+    (sampler::NoiseSampler)(noise; checks=true)
 
-Generate a complex Gaussian noise realization in-place.
+Generate a complex Gaussian noise realization in place.
 
-Internal workspace is reused to avoid repeated memory allocations.
+The sampler reuses an internal workspace to avoid repeated memory
+allocations.
 
 # Arguments
-- `noise`: output vector. Its length must equal the discretization grid size.
+- `noise::Vector{ComplexF64}`: output vector. Its length must equal the
+  discretization grid size.
+
+# Keyword arguments
+- `checks::Bool`: if `true`, verify that `noise` has the expected length.
 """
 @inline function (sampler::NoiseSampler)(
                                     noise::Vector{ComplexF64}; 
@@ -14,7 +19,6 @@ Internal workspace is reused to avoid repeated memory allocations.
                                 )
 
     (; _time_grid, _vecs, _vals, container) = sampler
-
     n_points = _time_grid.n_points
 
     if checks
@@ -26,6 +30,7 @@ Internal workspace is reused to avoid repeated memory allocations.
         container[i] = _vals[i] * (randn() + 1im * randn()) * invroot2
     end
 
+    # Transform the independent Gaussian coefficients to correlated noise.
     mul!(noise, _vecs, container)
 
     return nothing

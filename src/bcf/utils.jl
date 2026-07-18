@@ -3,12 +3,13 @@
 # =============================================================================
 
 """
-    create_random_bcf(N::Int)
+    random_bcf(N::Int)
 
-Create a random nonstationary bath correlation function with `N` modes.
+Create a random bath-correlation function (BCF) with `N` modes.
 
-This helper is intended for tests only. The generated BCF uses
-positive weights and is not meant to represent a specific physical system.
+This helper is intended for internal testing only. The generated BCF uses
+random parameters and is not intended to represent a physically meaningful
+system.
 """
 function random_bcf(N::Int)
     @assert N > 0 "Number of modes should be positive and nonzero."
@@ -20,8 +21,7 @@ function random_bcf(N::Int)
     return _random_bcf(Val(N))
 end
 
-# Internal implementation. `N` is passed through `Val` so that the
-# StaticArrays size is known at compile time.
+# Internal implementation. 
 function _random_bcf(::Val{N}) where {N}
     Γ = SVector{N,Float64}(rand() for _ in 1:N)
     ω = SVector{N,Float64}(rand() for _ in 1:N)

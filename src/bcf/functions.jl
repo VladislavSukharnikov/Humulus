@@ -5,7 +5,7 @@
 """
     phasecomb(t, ω, φ, u, v)
 
-Compute the phase combination
+Return the phase combination
 
     u * exp(-im*x) - v * exp(im*x)
 
@@ -15,16 +15,16 @@ where
 
 Equivalently,
 
-    phasecomb(t, ω, φ, u, v) = u*conj(cis(x)) - v*cis(x)
+    u*cis(-x) - v*cis(x)
 
 The following parameter choices recover common functions:
 
-| Function  | `u`           | `v`           |
-|:----------|:--------------|:--------------|
-| `cos(x)`  | `0.5`         | `-0.5`        |
-| `sin(x)`  | `0.5im`       | `0.5im`       |
-| `-sin(x)` | `-0.5im`      | `-0.5im`      |
-| `exp(im*x)` | `0.0`       | `-1.0`        |
+| Function    | `u`       | `v`       |
+|:------------|:----------|:----------|
+| `cos(x)`    | `0.5`     | `-0.5`    |
+| `sin(x)`    | `0.5im`   | `0.5im`   |
+| `-sin(x)`   | `-0.5im`  | `-0.5im`  |
+| `exp(im*x)` | `0.0`     | `-1.0`    |
 """
 @inline function phasecomb(
                     t::Float64, 

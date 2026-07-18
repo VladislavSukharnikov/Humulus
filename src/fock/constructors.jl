@@ -1,12 +1,13 @@
 """
     FockSpace(::Val{N}, max_occupancies; KeyType=Int, IndType=Int)
 
-Construct a truncated `N`-mode Fock space.
+Construct and return a truncated `N`-mode Fock space.
 
-The truncation is specified by `max_occupancies`, which may be either
+The truncation is specified by `max_occupancies`, which may be
 
-- an `Int`, retaining all basis states satisfying `∑ᵢ nᵢ ≤ max_occupancies`, or
-- an `NTuple{N,Int}`, specifying an independent occupation cutoff for each mode.
+- an `Int`, retaining all basis states satisfying `∑ᵢ nᵢ ≤ max_occupancies`,
+- an `NTuple{N,Int}`, specifying an independent occupation cutoff for each mode, or
+- a `Vector{Int}` of length `N`, which is converted internally to an `NTuple`.
 
 The constructor generates the Fock-space basis together with lookup tables
 for basis indexing and neighboring basis states.
@@ -18,12 +19,18 @@ for basis indexing and neighboring basis states.
 - `KeyType`: integer type used to store occupation numbers.
 - `IndType`: integer type used to store basis indices.
 
-# Returns
-- `FockSpace`: truncated Fock-space representation with precomputed lookup tables.
+# Exceptions
+
+An exception is thrown if
+
+- `N ≤ 0`;
+- any truncation level is negative;
+- the number of truncation levels does not equal `N`; or
+- the resulting Fock space cannot be represented using the selected `KeyType` or `IndType`.
 """
 function FockSpace(
                 ::Val{N},
-                max_occupancies::Union{NTuple{N,Int},Int,Vector{Int}},
+                max_occupancies::Union{NTuple{N,Int},Int,Vector{Int}};
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int
             ) where {N}
@@ -90,7 +97,7 @@ function FockSpace(
     # Verify that the generated basis has the expected size.
     @assert length(state_to_index) == length(basis_states) == fock_dim  "Internal error: inconsistent Fock space size."
     
-        # Precompute neighboring basis indices for raising and lowering operators.
+    # Precompute neighboring basis indices for raising and lowering operators.
     raise_index = zeros(IndType, N, fock_dim)
     lower_index = zeros(IndType, N, fock_dim)
 

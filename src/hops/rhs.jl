@@ -1,3 +1,16 @@
+"""
+    (hops::HOPS{N})(du, u, solver_params, t)
+
+Evaluate the right-hand side of the hierarchy of pure states (HOPS).
+
+The result is written in-place to `du`, overwriting its previous contents.
+
+# Arguments
+- `du`: output state derivative.
+- `u`: hierarchy state.
+- `solver_params`: solver parameters created by `create_solver_params`.
+- `t::Float64`: time.
+"""
 function (hops::HOPS{N})(du::ArrayPartition{ComplexF64},
                            u::ArrayPartition{ComplexF64}, 
                            solver_params::NamedTuple, 
@@ -14,7 +27,7 @@ function (hops::HOPS{N})(du::ArrayPartition{ComplexF64},
     # Evaluate the noise value.
     z_t = interpolate_noise(hops._time_grid, noise, t)
 
-    # Evaluate the helpers.
+    # Evaluate the auxiliary quantities.
     for j in 1:N
         f_tmp[j] = 1im*G[j]*f_vector[j](t)
         g_tmp[j] = 1im*G[j]*conj(g_vector[j](t))
@@ -24,9 +37,18 @@ function (hops::HOPS{N})(du::ArrayPartition{ComplexF64},
 
     # Compute the HOPS right-hand side.
     _fill_dψ!(dψ, ψ, solver_params, L_av, z_t, f_tmp, g_tmp, hops._sqrt_of_int) 
+
     return nothing
 end
 
+
+"""
+    _fill_dψ!(dψ, ψ, solver_params, L_av, z_t, f_tmp, g_tmp, sqrt_of_int)
+
+Compute the HOPS state derivative in place.
+
+The result is written to `dψ`, overwriting its previous contents.
+"""
 @inline function _fill_dψ!(dψ::AbstractArray{ComplexF64,2},
                            ψ::AbstractArray{ComplexF64,2},
                            solver_params::NamedTuple, 

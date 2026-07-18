@@ -1,15 +1,15 @@
 """
     (hme::HME{N})(dρ, ρ, solver_params, t)
 
-Evaluate the right-hand side of the hierarchy of master equations.
+Evaluate the right-hand side of the hierarchy of master equations (HME).
 
-The result is written in-place to `dρ`.
+The result is written in-place to `dρ`, overwriting its previous contents.
 
 # Arguments
-- `dρ`: array containing the time derivative.
+- `dρ`: output array containing the time derivative.
 - `ρ`: hierarchy state.
 - `solver_params`: solver parameters created by `create_solver_params`.
-- `t`: time.
+- `t::Float64`: time.
 """
 function (hme::HME{N})(
                     dρ::Array{ComplexF64,4}, 
@@ -37,9 +37,9 @@ end
 """
     _fill_dρ!(dρ, ρ, solver_params, f_tmp, g_tmp, sqrt_of_int)
 
-Evaluate the right-hand side of the hierarchy of master equations.
+Compute the right-hand side of the hierarchy of master equations (HME).
 
-The result is written in-place to `dρ`.
+The result is written in-place to `dρ`, overwriting its previous contents.
 """
 @inline function _fill_dρ!(
                         dρ::Array{ComplexF64,4},

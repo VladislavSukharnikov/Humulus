@@ -20,9 +20,9 @@ roots used when applying creation and annihilation operators.
 - `_sqrt_of_int`: lookup table containing `sqrt.(0:MaxFockStates-1)`.
 """
 mutable struct HME{N,MaxFockStates}<:Function
-    f_tmp::MVector{N,ComplexF64}
-    g_tmp::MVector{N,ComplexF64}
-    _sqrt_of_int::SVector{MaxFockStates,Float64}   
+    f_tmp        :: MVector{N,ComplexF64}
+    g_tmp        :: MVector{N,ComplexF64}
+    _sqrt_of_int :: SVector{MaxFockStates,Float64}   
 end
 
 
@@ -57,8 +57,8 @@ function HME{N,MaxFockStates}() where {N,MaxFockStates}
         throw(DomainError(MaxFockStates, "`MaxFockStates` must be at least 1, since the vacuum state is always included."))
 
     # Allocate temporary work buffers.
-    f_tmp = zeros(MVector{N,ComplexF64})
-    g_tmp = zeros(MVector{N,ComplexF64})
+    f_tmp = MVector{N,ComplexF64}(undef)
+    g_tmp = MVector{N,ComplexF64}(undef)
 
     # Precompute square roots of the occupation numbers.
     sqrt_of_int = SVector{MaxFockStates,Float64}(sqrt(i) for i in 0:MaxFockStates-1)

@@ -71,8 +71,8 @@ function HOPS{N,MaxFockStates}(time_grid::TimeGrid) where {N,MaxFockStates}
 
         
     # Allocate temporary buffers.
-    f_tmp = zeros(MVector{N,ComplexF64})
-    g_tmp = zeros(MVector{N,ComplexF64})
+    f_tmp = MVector{N,ComplexF64}(undef)
+    g_tmp = MVector{N,ComplexF64}(undef)
 
     # Precompute square roots of the occupation numbers.
     sqrt_of_int = SVector{MaxFockStates,Float64}(sqrt(i) for i in 0:MaxFockStates-1)

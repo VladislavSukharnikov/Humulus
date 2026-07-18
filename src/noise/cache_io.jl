@@ -25,16 +25,14 @@ An exception is thrown if
 function sampler_from_cache(
                 path::String; 
                 checks::Bool=true, 
-                clear_cache::Bool=false
+                clear_cache::Bool=false,
             )
 
     @assert isfile(path) "Cache file does not exist: $path"
 
     # Load precomputed data from disk.
     bcf_eigen::BCFEigen = load_object(path)::BCFEigen
-    if clear_cache
-        rm(path)
-    end
+    clear_cache && rm(path)
 
     # Extract the stored bath correlation matrix eigendecomposition.
     (; time_grid, vals, vecs) = bcf_eigen
@@ -74,6 +72,11 @@ Cache files are stored in the `bcf_eigen_cache` directory.
 - `bcf::BCF`: bath correlation function.
 - `t_end::Float64`: final time of the discretization interval.
 - `grid_size::Int`: number of discretization points.
+
+# Keyword arguments
+
+- `logging::Bool=true`: if `true` (default), emit informational messages
+  describing cache reuse, cache creation, and eigendecomposition progress.
 
 # Notes
 

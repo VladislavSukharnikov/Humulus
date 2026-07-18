@@ -30,14 +30,15 @@ function BCFEigen(
     # Construct the discretization grid.
     time_grid = TimeGrid(0.0, t_end, grid_size)
 
-    # Assemble the discretized bath correlation matrix.
+    # Assemble the upper triangular part of the discretized bath correlation matrix.
     bcf_matrix = Matrix{ComplexF64}(undef, grid_size, grid_size)
-    @inbounds for t in 1:grid_size, s in 1:grid_size
-        bcf_matrix[t,s] = bcf(time_grid[t], time_grid[s])
+    @inbounds for t in 1:grid_size
+        for s in 1:t
+            bcf_matrix[t, s] = bcf(time_grid[t], time_grid[s])
+        end
     end
 
-    # Compute the eigendecomposition of the discretized bath correlation matrix.
-    vals, vecs = eigen!(Hermitian(bcf_matrix))
+    vals, vecs = eigen!(Hermitian(bcf_matrix, :L))
 
     # Warn if the matrix is not positive semidefinite.
     if any(vals .< 0.0)

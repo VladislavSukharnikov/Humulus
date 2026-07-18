@@ -20,8 +20,8 @@ Calling `FuncWrapper(f, params)(t)` is equivalent to
 - `params`: tuple of stored parameters.
 """
 struct FuncWrapper{F,P}<:Function
-    f::F
-    params::P
+    f      :: F
+    params :: P
 end
 
 # Evaluate the wrapped function using the stored parameters.

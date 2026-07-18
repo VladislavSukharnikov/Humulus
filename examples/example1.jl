@@ -100,6 +100,8 @@ addprocs(n_workers)
 
 n_trajectories = 1000
 n_batches = 100
+@info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches) "
+
 out = @batched n_batches solve_hops(
     grid_params,
     bcf,
@@ -114,5 +116,4 @@ out = @batched n_batches solve_hops(
 
 ρ_s = out.x[1]./out.x[2]
 
-@info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches) "
 @info "Actual number of trajectories: $(out.x[2][1])"

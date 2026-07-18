@@ -14,7 +14,7 @@ let
     @info "Three-mode squeezed reservoir BCF."
 
     t_end     = 20.0
-    grid_size = 500
+    grid_size = 1000
 
     bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
 
@@ -38,7 +38,7 @@ let
     @info "Three-mode squeezed reservoir BCF."
 
     t_end = 20.0
-    grid_size = 500
+    grid_size = 5_000
 
     bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
 
@@ -46,7 +46,7 @@ let
     path = joinpath("bcf_eigen_cache", "bench_noise.jld2")
     save_object(path, bcf_eigen)
 
-    sampler! = Humulus.sampler_from_cache(path; checks = true, clear_cache = false)
+    sampler! = Humulus.sampler_from_cache(path; checks = true, clear_cache = false);
 
     @info "Benchmark parameters" grid_size
 

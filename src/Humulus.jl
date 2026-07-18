@@ -16,7 +16,7 @@ module Humulus
     using JLD2: save_object, load_object
 
     # Parallel computation
-    using Distributed: addprocs, rmprocs, pmap, WorkerPool
+    using Distributed: pmap, WorkerPool
 
 
     # =============================================================================

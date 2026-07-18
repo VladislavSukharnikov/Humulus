@@ -21,9 +21,7 @@ allocations.
     (; _time_grid, _vecs, _vals, container) = sampler
     n_points = _time_grid.n_points
 
-    if checks
-        @assert length(noise) == n_points "Noise vector length mismatch."
-    end
+    checks && @assert length(noise) == n_points "Noise vector length mismatch."
 
     # Generate independent complex Gaussian coefficients.
     for i in 1:n_points

@@ -135,10 +135,11 @@ If the cache directory does not exist, the function does nothing.
 """
 function clear_bcf_eigen_cache()
     dir = "bcf_eigen_cache"
-    isdir(dir) || return
+    isdir(dir) || return nothing
 
     # Remove all cached eigendecompositions.
     for entry in readdir(dir; join=true)
         rm(entry; recursive=true, force=true)
     end
+    return nothing
 end

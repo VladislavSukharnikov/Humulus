@@ -74,7 +74,7 @@ function FockSpace(
         max_occupancies = NTuple{N,Int}(max_occupancies)
     end
     
-    fock_dim  = Int(fock_dim)
+    fock_dim = Int(fock_dim)
 
     # Allocate storage for the basis lookup tables.
     state_to_index = Dict{SVector{N,KeyType}, IndType}()

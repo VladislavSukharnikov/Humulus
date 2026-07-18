@@ -11,18 +11,20 @@ The result is written in-place to `du`, overwriting its previous contents.
 - `solver_params`: solver parameters created by `create_solver_params`.
 - `t::Float64`: time.
 """
-function (hops::HOPS{N})(du::ArrayPartition{ComplexF64},
-                           u::ArrayPartition{ComplexF64}, 
-                           solver_params::NamedTuple, 
-                           t::Float64) where {N}
+function (hops::HOPS{N})(
+                    du::ArrayPartition{ComplexF64},
+                    u::ArrayPartition{ComplexF64}, 
+                    solver_params::NamedTuple, 
+                    t::Float64
+                ) where {N}
     (; Γ, G, f_vector, g_vector) = solver_params
     (; f_tmp, g_tmp, noise) = hops
 
-    ψ, X    = u.x
-    dψ, dX  = du.x
+    ψ, X   = u.x
+    dψ, dX = du.x
 
     # Evaluate the average dipole moment.
-    L_av :: ComplexF64 = (conj(ψ[1])*ψ[2]+conj(ψ[2])*ψ[1])/(abs2(ψ[1])+abs2(ψ[2]))
+    L_av::ComplexF64 = (conj(ψ[1])*ψ[2]+conj(ψ[2])*ψ[1])/(abs2(ψ[1])+abs2(ψ[2]))
 
     # Evaluate the noise value.
     z_t = interpolate_noise(hops._time_grid, noise, t)
@@ -49,14 +51,16 @@ Compute the HOPS state derivative in place.
 
 The result is written to `dψ`, overwriting its previous contents.
 """
-@inline function _fill_dψ!(dψ::AbstractArray{ComplexF64,2},
-                           ψ::AbstractArray{ComplexF64,2},
-                           solver_params::NamedTuple, 
-                           L_av::ComplexF64,
-                           z_t::ComplexF64,
-                           f_tmp::MVector,
-                           g_tmp::MVector,
-                           sqrt_of_int::SVector)
+@inline function _fill_dψ!(
+                        dψ::AbstractArray{ComplexF64,2},
+                        ψ::AbstractArray{ComplexF64,2},
+                        solver_params::NamedTuple, 
+                        L_av::ComplexF64,
+                        z_t::ComplexF64,
+                        f_tmp::MVector,
+                        g_tmp::MVector,
+                        sqrt_of_int::SVector
+                    )
     (; N, ν₀, basis_states, fock_dim, Γ, raise_index, lower_index) = solver_params
     mode_range = 1:N
 

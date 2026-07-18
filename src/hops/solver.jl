@@ -98,9 +98,7 @@ function solve_hops(
     end
 
     # Remove the cached decomposition if requested.
-    if clear_cache
-        rm(path)
-    end
+    clear_cache && rm(path)
 
     return output
 end
@@ -204,9 +202,6 @@ end
 Evaluate `expr` repeatedly for `n_batches` iterations, accumulating the
 returned values.
 
-If an exception is thrown, the accumulated result from all completed
-batches is returned after emitting a warning.
-
 # Arguments
 - `n_batches`: number of batches.
 - `expr`: expression to evaluate in each batch.
@@ -217,23 +212,18 @@ macro batched(n_batches, call)
         local _result = nothing
         local _completed = 0
 
-        try
-            for _batch in 1:_n_batches
-                local _out = $(esc(call))
+        for _batch in 1:_n_batches
+            local _out = $(esc(call))
 
-                if _result === nothing
-                    _result = _out
-                else
-                    _result += _out
-                end
-
-                _completed = _batch
-                @info "Finished batch $_batch/$_n_batches."
+            if _result === nothing
+                _result = _out
+            else
+                _result += _out
             end
-        catch err
-            @warn "Stopped after $_completed completed batches." exception=(err, catch_backtrace())
-        end
 
+            _completed = _batch
+            @info "Finished batch $_batch/$_n_batches."
+        end
         _result
     end
 end

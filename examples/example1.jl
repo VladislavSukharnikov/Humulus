@@ -74,7 +74,7 @@ max_occupancy = 50
 # -----------------------------------------------------------------------------
 
 n_trajectories = 1
-out = @time solve_hops(
+out = solve_hops(
     grid_params,
     bcf,
     atom_params,
@@ -83,6 +83,7 @@ out = @time solve_hops(
     clear_cache=false,
     show_progress=true,
 );
+
 
 ρ_s = out.x[1]./out.x[2];
 
@@ -97,19 +98,21 @@ addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 1
-out = @time solve_hops(
+n_trajectories = 1000
+n_batches = 100
+out = @batched n_batches solve_hops(
     grid_params,
     bcf,
     atom_params,
     max_occupancy;
     n_trajectories=n_trajectories,
     clear_cache=false,
-    show_progress=true,
+    show_progress=false,
+    logging=false,
     workers=workers(),
 );
 
 ρ_s = out.x[1]./out.x[2]
 
-@info "Expected number of trajectories: $(n_trajectories*length(workers())) "
+@info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches) "
 @info "Actual number of trajectories: $(out.x[2][1])"

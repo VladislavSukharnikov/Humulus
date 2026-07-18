@@ -74,6 +74,7 @@ module Humulus
             GridParams,
             solve_hme,
             solve_hops,
-            bloch_vector
+            bloch_vector,
+            @batched
     nothing
 end 

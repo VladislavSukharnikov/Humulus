@@ -84,7 +84,8 @@ cache.
 function get_bcf_eigen_cache(
                         bcf::BCF,
                         t_end::Float64,
-                        grid_size::Int,
+                        grid_size::Int;
+                        logging::Bool=true,
                     )
 
     dir = "bcf_eigen_cache"
@@ -99,27 +100,27 @@ function get_bcf_eigen_cache(
             bcf_eigen::BCFEigen = load_object(path)::BCFEigen
             loaded_bcf::BCF     = bcf_eigen.bcf::BCF
 
-            @info "Found an existing cache."
+            logging && @info "Found an existing cache."
             if  loaded_bcf == bcf &&
                 bcf_eigen.time_grid[1] == 0.0 &&
                 bcf_eigen.time_grid[end] >= t_end &&
                 bcf_eigen.time_grid.n_points == grid_size 
 
-                @info "The existing cache is compatible. Reusing it."
+                logging && @info "The existing cache is compatible. Reusing it."
                 return path
             end
-            @info "The existing cache is incompatible. Rebuilding."
+            logging && @info "The existing cache is incompatible. Rebuilding."
         catch err
-            @info "Failed to read the existing cache. Rebuilding." exception=(err, catch_backtrace())
+            logging && @info "Failed to read the existing cache. Rebuilding." exception=(err, catch_backtrace())
         end
     else
-        @info "No existing cache found. Building a new one."
+        logging && @info "No existing cache found. Building a new one."
     end
 
-    @info "Computing the eigendecomposition of the discretized bath correlation matrix ($grid_size × $grid_size)."
+    logging && @info "Computing the eigendecomposition of the discretized bath correlation matrix ($grid_size × $grid_size)."
     bcf_eigen = BCFEigen(bcf, t_end, grid_size)
     save_object(path, bcf_eigen)
-    @info "Eigendecomposition completed. Results saved to \"$path\"."
+    logging && @info "Eigendecomposition completed. Results saved to \"$path\"."
 
     return path
 end

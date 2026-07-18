@@ -45,6 +45,7 @@ function solve_hops(
                 IndType::Type{<:Integer}=Int,
                 clear_cache::Bool=true,
                 show_progress::Bool=true,
+                logging::Bool=true,
                 workers::Vector{Int}=[1],
             ) where {N}
 
@@ -66,7 +67,7 @@ function solve_hops(
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
 
     # Compute or retrieve the cached BCF eigenvalue decomposition.
-    path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size)
+    path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size; logging=logging)
 
     # Solve the HOPS equations serially or in parallel.
     if workers==[1] || length(workers)==1 || length(workers)==0
@@ -194,4 +195,45 @@ function accumulate_trajectory!(ρ_s::Array{ComplexF64,3}, ψ::Array{ComplexF64,
     ρ_s[2,2,t_idx] += abs2(ψ_e)/C₀
     
     return nothing
+end
+
+
+"""
+    @batched n_batches expr
+
+Evaluate `expr` repeatedly for `n_batches` iterations, accumulating the
+returned values.
+
+If an exception is thrown, the accumulated result from all completed
+batches is returned after emitting a warning.
+
+# Arguments
+- `n_batches`: number of batches.
+- `expr`: expression to evaluate in each batch.
+"""
+macro batched(n_batches, call)
+    quote
+        local _n_batches = $(esc(n_batches))
+        local _result = nothing
+        local _completed = 0
+
+        try
+            for _batch in 1:_n_batches
+                local _out = $(esc(call))
+
+                if _result === nothing
+                    _result = _out
+                else
+                    _result += _out
+                end
+
+                _completed = _batch
+                @info "Finished batch $_batch/$_n_batches."
+            end
+        catch err
+            @warn "Stopped after $_completed completed batches." exception=(err, catch_backtrace())
+        end
+
+        _result
+    end
 end

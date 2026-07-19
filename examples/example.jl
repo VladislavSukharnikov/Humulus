@@ -53,7 +53,7 @@ end;
 
 grid_params = let
     t_end    = 20.0  # final simulation time
-    n_save   = 250   # number of intervals between saved time points
+    n_save   = 500   # number of intervals between saved time points
     substeps = 5     # maximum internal integration substeps per save interval
     @info "Expected minimal number of steps is $(n_save*substeps)."
     GridParams(t_end, n_save, substeps)

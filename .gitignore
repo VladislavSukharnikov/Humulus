@@ -1,5 +1,5 @@
 # Cache
-covariance_cache/
+cache/
 
 # Julia
 *.ji

@@ -42,8 +42,8 @@ let
 
     bcf_chol = Humulus.BCFCholesky(bcf, t_end, grid_size)
 
-    mkpath("covariance_cache")
-    path = joinpath("covariance_cache", "bench_noise.jld2")
+    mkpath("cache")
+    path = joinpath("cache", "bench_noise.jld2")
     save_object(path, bcf_chol)
 
     sampler! = Humulus.sampler_from_cache(path; checks = true, clear_cache = false);
@@ -74,8 +74,8 @@ let
 
         bcf_chol = Humulus.BCFCholesky(bcf, t_end, grid_size)
 
-        mkpath("covariance_cache")
-        path = joinpath("covariance_cache", "bench_noise.jld2")
+        mkpath("cache")
+        path = joinpath("cache", "bench_noise.jld2")
 
         save_object(path, bcf_chol)
 

@@ -67,7 +67,7 @@ function solve_hops(
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
 
     # Compute or retrieve the cached BCF eigenvalue decomposition.
-    path = get_covariance_cache(BCFCholesky, bcf, ts_save.t_end, grid_size; logging=logging)
+    path = get_cache(BCFCholesky, bcf, ts_save.t_end, grid_size; logging=logging)
 
     # Solve the HOPS equations serially or in parallel.
     if workers==[1] || length(workers)==1 || length(workers)==0

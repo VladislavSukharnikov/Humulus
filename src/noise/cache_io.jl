@@ -59,7 +59,7 @@ end
 
 
 """
-    get_covariance_cache(bcf, t_end, grid_size)
+    get_cache(bcf, t_end, grid_size)
 
 Return the path to a cached `BCFEigen` object.
 
@@ -86,7 +86,7 @@ An existing cache file is reused only if its contents are consistent with
 the requested parameters. Otherwise, it is replaced with a newly generated
 cache.
 """
-function get_covariance_cache(
+function get_cache(
                         ::Type{T},
                         bcf::BCF,
                         t_end::Float64,
@@ -101,7 +101,7 @@ function get_covariance_cache(
         throw(ArgumentError("`t_end` must be positive, got $t_end."))
 
     # Constructing cache filename.
-    dir = "covariance_cache"
+    dir = "cache"
     mkpath(dir)
     filename = string(nameof(T), "_", bcf_hash(bcf), "_", hash((grid_size, t_end)), ".jld2")
     path     = joinpath(dir, filename)
@@ -139,14 +139,14 @@ end
 
 
 """
-    clear_covariance_cache()
+    clear_cache()
 
 Remove all cached `BCFEigen` objects.
 
 If the cache directory does not exist, the function does nothing.
 """
-function clear_covariance_cache()
-    dir = "covariance_cache"
+function clear_cache()
+    dir = "cache"
     isdir(dir) || return nothing
 
     # Remove all cached eigendecompositions.

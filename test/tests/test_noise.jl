@@ -13,8 +13,8 @@
         t_end = 20.0
         bcf_eigen = BCFEigen(bcf, t_end, grid_size)
 
-        mkpath("covariance_cache")
-        path = joinpath("covariance_cache", "test.jld2")
+        mkpath("cache")
+        path = joinpath("cache", "test.jld2")
         save_object(path, bcf_eigen)
 
         @testset "Serialization" begin
@@ -46,8 +46,8 @@ end;
         t_end = 20.0
         bcf_chol = BCFCholesky(bcf, t_end, grid_size)
 
-        mkpath("covariance_cache")
-        path = joinpath("covariance_cache", "test.jld2")
+        mkpath("cache")
+        path = joinpath("cache", "test.jld2")
         save_object(path, bcf_chol)
 
         @testset "Serialization" begin
@@ -82,8 +82,8 @@ end;
             t_end = 20.0
             decomposition = Decomp(bcf, t_end, grid_size)
 
-            mkpath("covariance_cache")
-            path = joinpath("covariance_cache", "test.jld2")
+            mkpath("cache")
+            path = joinpath("cache", "test.jld2")
             save_object(path, decomposition)
 
             sampler! = sampler_from_cache(path; checks=true, clear_cache=true)
@@ -114,8 +114,8 @@ end;
             t_end = 20.0
             decomposition = Decomp(bcf, t_end, grid_size)
 
-            mkpath("covariance_cache")
-            path = joinpath("covariance_cache", "test.jld2")
+            mkpath("cache")
+            path = joinpath("cache", "test.jld2")
             save_object(path, decomposition)
 
             sampler! = sampler_from_cache(path; checks=true, clear_cache=true)
@@ -147,8 +147,8 @@ end;
             t_end = 20.0
             decomposition = Decomp(bcf, t_end, grid_size)
 
-            mkpath("covariance_cache")
-            path = joinpath("covariance_cache", "test.jld2")
+            mkpath("cache")
+            path = joinpath("cache", "test.jld2")
             save_object(path, decomposition)
 
             sampler! = sampler_from_cache(path; checks=true, clear_cache=true)

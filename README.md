@@ -238,6 +238,7 @@ n_workers * n_trajectories * n_batches
 ```
 
 and `out.x[2]` should again equal this value upon successful completion.
+
 ---
 
 ## Citation

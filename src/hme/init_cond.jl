@@ -20,10 +20,10 @@ function init_hme!(ρ::AbstractArray{ComplexF64,4}, c_g::T, c_e::T) where {T<:Nu
     # Clear all entries before writing the initial state.
     fill!(ρ, 0.0im)
 
-    ρ[1,1,1,1] = abs2(c_g)
-    ρ[2,1,1,1] = c_e * conj(c_g)
-    ρ[1,2,1,1] = c_g * conj(c_e)
-    ρ[2,2,1,1] = abs2(c_e)
+    ρ[1, 1, 1, 1] = abs2(c_g)
+    ρ[2, 1, 1, 1] = c_e * conj(c_g)
+    ρ[1, 2, 1, 1] = c_g * conj(c_e)
+    ρ[2, 2, 1, 1] = abs2(c_e)
 
     return nothing
 end

@@ -24,17 +24,17 @@ function (hops::HOPS{N})(
     dψ, dX = du.x
 
     # Evaluate the average dipole moment.
-    L_av::ComplexF64 = (conj(ψ[1])*ψ[2]+conj(ψ[2])*ψ[1])/(abs2(ψ[1])+abs2(ψ[2]))
+    L_av::ComplexF64 = (conj(ψ[1]) * ψ[2] + conj(ψ[2]) * ψ[1])/(abs2(ψ[1]) + abs2(ψ[2]))
 
     # Evaluate the noise value.
     z_t = interpolate_noise(hops._time_grid, noise, t)
 
     # Evaluate the auxiliary quantities.
     for j in 1:N
-        f_tmp[j] = 1im*G[j]*f_vector[j](t)
-        g_tmp[j] = 1im*G[j]*conj(g_vector[j](t))
-        z_t     -= 1im*f_vector[j](t)*X[j]
-        dX[j]    = -Γ[j]*X[j]+G[j]^2*conj(g_vector[j](t))*L_av
+        f_tmp[j] = 1im * G[j] * f_vector[j](t)
+        g_tmp[j] = 1im * G[j] * conj(g_vector[j](t))
+        z_t     -= 1im * f_vector[j](t) * X[j]
+        dX[j]    = -Γ[j] * X[j] + G[j]^2 * conj(g_vector[j](t)) * L_av
     end
 
     # Compute the HOPS right-hand side.
@@ -66,34 +66,34 @@ The result is written to `dψ`, overwriting its previous contents.
 
     @inbounds for n_idx in 1:fock_dim
         n = basis_states[n_idx]
-        ψ₁, ψ₂ = @view ψ[:,n_idx]
+        ψ₁, ψ₂ = @view ψ[:, n_idx]
 
-        dψ₁ = 1im*(ν₀/2*ψ₁-conj(z_t)*ψ₂)
-        dψ₂ =-1im*(ν₀/2*ψ₂+conj(z_t)*ψ₁)
+        dψ₁ = 1im * (ν₀/2 * ψ₁ - conj(z_t) * ψ₂)
+        dψ₂ =-1im * (ν₀/2 * ψ₂ + conj(z_t) * ψ₁)
 
         totalΓ = 0.0
     
         # sqrt_of_int[k] = √(k-1).
         # Accumulate couplings to neighboring hierarchy elements
         @inbounds for mode in mode_range
-            nₐ = n[mode]; 
-            totalΓ += Γ[mode]*nₐ
-            idx_prev, idx_next = lower_index[mode,n_idx], raise_index[mode,n_idx]
+            nₐ = n[mode]
+            totalΓ += Γ[mode] * nₐ
+            idx_prev, idx_next = lower_index[mode, n_idx], raise_index[mode, n_idx]
             if idx_prev != 0
-                prev_ψ₁, prev_ψ₂ = @view ψ[:,idx_prev]
-                tmp = g_tmp[mode] * sqrt_of_int[nₐ+1]
-                dψ₁ += -tmp*prev_ψ₂
-                dψ₂ += -tmp*prev_ψ₁
+                prev_ψ₁, prev_ψ₂ = @view ψ[:, idx_prev]
+                tmp = g_tmp[mode] * sqrt_of_int[nₐ + 1]
+                dψ₁ += -tmp * prev_ψ₂
+                dψ₂ += -tmp * prev_ψ₁
             end
             if idx_next != 0
-                next_ψ₁, next_ψ₂ = @view ψ[:,idx_next]
-                tmp = f_tmp[mode] * sqrt_of_int[nₐ+2]
-                dψ₁ += -tmp*(next_ψ₂-L_av*next_ψ₁)
-                dψ₂ += -tmp*(next_ψ₁-L_av*next_ψ₂)
+                next_ψ₁, next_ψ₂ = @view ψ[:, idx_next]
+                tmp = f_tmp[mode] * sqrt_of_int[nₐ + 2]
+                dψ₁ += -tmp * (next_ψ₂ - L_av * next_ψ₁)
+                dψ₂ += -tmp * (next_ψ₁ - L_av * next_ψ₂)
             end
         end
-        dψ[1,n_idx]=dψ₁-totalΓ*ψ₁
-        dψ[2,n_idx]=dψ₂-totalΓ*ψ₂
+        dψ[1, n_idx] = dψ₁ - totalΓ * ψ₁
+        dψ[2, n_idx] = dψ₂ - totalΓ * ψ₂
     end
     return nothing
 end

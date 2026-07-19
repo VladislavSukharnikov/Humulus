@@ -59,12 +59,12 @@ function solve_hops(
     # Construct the pseudo-Fock space and solver parameters.
     fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
     solver_params   = create_solver_params(bcf, fock_space, atom_params)
-    max_fock_states = maximum(max_occupancies)+1
+    max_fock_states = maximum(max_occupancies) + 1
 
     # Construct the grid used to sample the stochastic noise.
     (; dt_max, ts_save) = grid_params
     dt_noise  = dt_max / noise_oversampling
-    grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
+    grid_size = ceil(Int, ts_save.t_end / dt_noise)
 
     # Compute or retrieve the cached BCF eigenvalue decomposition.
     path = get_cache(BCFCholesky, bcf, ts_save.t_end, grid_size; logging=logging)
@@ -185,12 +185,12 @@ function accumulate_trajectory!(ρ_s::Array{ComplexF64,3}, ψ::Array{ComplexF64,
     ψ_e = ψ[2]
 
     # Normalize the stochastic state before accumulating its contribution.
-    C₀ = abs2(ψ_g)+abs2(ψ_e)
+    C₀ = abs2(ψ_g) + abs2(ψ_e)
 
-    ρ_s[1,1,t_idx] += abs2(ψ_g)/C₀
-    ρ_s[1,2,t_idx] += conj(ψ_e)*ψ_g/C₀
-    ρ_s[2,1,t_idx] += conj(ψ_g)*ψ_e/C₀
-    ρ_s[2,2,t_idx] += abs2(ψ_e)/C₀
+    ρ_s[1, 1, t_idx] += abs2(ψ_g) / C₀
+    ρ_s[1, 2, t_idx] += conj(ψ_e) * ψ_g / C₀
+    ρ_s[2, 1, t_idx] += conj(ψ_g) * ψ_e / C₀
+    ρ_s[2, 2, t_idx] += abs2(ψ_e) / C₀
     
     return nothing
 end

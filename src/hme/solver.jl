@@ -38,7 +38,7 @@ function solve_hme(
     # Construct the pseudo-Fock space and solver parameters.
     fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
     solver_params   = create_solver_params(bcf, fock_space, atom_params)
-    max_fock_states = maximum(max_occupancies)+1
+    max_fock_states = maximum(max_occupancies) + 1
 
     # Dispatch to the implementation specialized on the problem size.
     return _solve_hme(
@@ -107,10 +107,10 @@ end
             adaptive=true, 
             dtmax=dt_max, 
             saveat=ts_save, 
-            dense = false, 
-            save_everystep = false, 
-            calck = false,
-            progress = true,
+            dense=false, 
+            save_everystep=false, 
+            calck=false,
+            progress=true,
         )
 
     # Save data.

@@ -209,21 +209,32 @@ returned values.
 macro batched(n_batches, call)
     quote
         local _n_batches = $(esc(n_batches))
+
+        # Accumulated result from all completed batches.
         local _result = nothing
+
+        # Number of successfully completed batches.
         local _completed = 0
 
-        for _batch in 1:_n_batches
-            local _out = $(esc(call))
+        try
+            for _batch in 1:_n_batches
+                # Run the next batch.
+                local _out = $(esc(call))
 
-            if _result === nothing
-                _result = _out
-            else
-                _result += _out
+                # Accumulate the batch result.
+                if _result === nothing
+                    _result = _out
+                else
+                    _result += _out
+                end
+
+                _completed = _batch
+                @info "Finished batch $_batch/$_n_batches."
             end
-
-            _completed = _batch
-            @info "Finished batch $_batch/$_n_batches."
+        catch err
+            @warn "Stopped after $_completed completed batches." exception=(err, catch_backtrace())
         end
+
         _result
     end
 end

@@ -93,14 +93,20 @@ function get_covariance_cache(
                         grid_size::Int;
                         logging::Bool=true,
                     ) where {T<:AbstractBCFDecomposition}
+    # Input validation.
+    grid_size >= 2 ||
+        throw(ArgumentError("`grid_size` must be at least 2, got $grid_size."))
 
+    t_end > 0.0 ||
+        throw(ArgumentError("`t_end` must be positive, got $t_end."))
+
+    # Constructing cache filename.
     dir = "covariance_cache"
     mkpath(dir)
-
-    key      = (T, t_end, bcf, grid_size)
-    filename = string(hash(key), ".jld2")
+    filename = string(nameof(T), "_", bcf_hash(bcf), "_", hash((grid_size, t_end)), ".jld2")
     path     = joinpath(dir, filename)
 
+    # Searching if the file already exists.
     if isfile(path)
         try
             cached::T = load_object(path)::T
@@ -110,7 +116,7 @@ function get_covariance_cache(
             if loaded_bcf == bcf &&
                 cached.time_grid[1] == 0.0 &&
                 cached.time_grid[end] >= t_end &&
-                cached.time_grid.n_points == grid_size 
+                cached.time_grid.t_end/cached.time_grid.n_points <= t_end/grid_size
 
                 logging && @info "The existing cache is compatible. Reusing it."
                 return path
@@ -148,4 +154,19 @@ function clear_covariance_cache()
         rm(entry; recursive=true, force=true)
     end
     return nothing
+end
+
+
+
+function bcf_hash(bcf::BCF{N}) where {N}
+    key = (
+            N,
+            bcf.Γ...,
+            bcf.G...,
+            (nameof(typeof(f.f)) for f in bcf.f_vector)...,
+            (x for p in (f.params for f in bcf.f_vector) for x in p)...,
+            (nameof(typeof(g.f)) for g in bcf.g_vector)...,
+            (x for p in (g.params for g in bcf.g_vector) for x in p)...,
+        )
+    return hash(key)
 end

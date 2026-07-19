@@ -34,7 +34,7 @@ end
 """
     _discretize_bcf(bcf, t_end, grid_size)
 
-Discretize a bath correlation function (BCF) on a uniform time grid.
+Discretize a bath-correlation function (BCF) on a uniform time grid.
 
 The returned covariance matrix is stored as a `Hermitian` wrapper whose lower
 triangular part contains the evaluated matrix entries.
@@ -57,8 +57,8 @@ A tuple `(time_grid, bcf_covariance)`, where
 """
 function _discretize_bcf(bcf::BCF, t_end::Float64, grid_size::Int)    
     # Input validation.
-    grid_size >= 1 ||
-        throw(ArgumentError("`grid_size` must be at least 1, got $grid_size."))
+    grid_size >= 2 ||
+        throw(ArgumentError("`grid_size` must be at least 2, got $grid_size."))
 
     t_end > 0.0 ||
         throw(ArgumentError("`t_end` must be positive, got $t_end."))

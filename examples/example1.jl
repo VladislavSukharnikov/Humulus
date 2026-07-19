@@ -16,7 +16,7 @@ bcf = let
     γ  = 1.0       # atom–field coupling strength
     
     one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ)
-end
+end;
 
 
 # -----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ atom_params = let
     c_g = inv(√2) * exp(-1im * π/4)
 
     AtomParams(ν₀, c_g, c_e)
-end
+end;
 
 
 # -----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ grid_params = let
     substeps = 5     # maximum internal integration substeps per save interval
     @info "Expected minimal number of steps is $(n_save*substeps)."
     GridParams(t_end, n_save, substeps)
-end
+end;
 
 
 # -----------------------------------------------------------------------------
@@ -80,10 +80,9 @@ out = @time solve_hops(
     atom_params,
     max_occupancy;
     n_trajectories=n_trajectories,
-    clear_cache=true,
+    clear_cache=false,
     show_progress=true,
 );
-
 
 ρ_s = out.x[1]./out.x[2];
 
@@ -93,26 +92,28 @@ out = @time solve_hops(
 
 using Distributed
 
-n_workers = 2#Sys.CPU_THREADS
+n_workers = Sys.CPU_THREADS
 addprocs(n_workers)
 
 @everywhere using Humulus
 
-n_trajectories = 1000
+n_trajectories = 100
 n_batches = 100
 @info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches) "
 
 out = @batched n_batches solve_hops(
-    grid_params,
-    bcf,
-    atom_params,
-    max_occupancy;
-    n_trajectories=n_trajectories,
-    clear_cache=false,
-    show_progress=false,
-    logging=false,
-    workers=workers(),
-);
+                            grid_params,
+                            bcf,
+                            atom_params,
+                            max_occupancy;
+                            n_trajectories=n_trajectories,
+                            clear_cache=false,
+                            show_progress=false,
+                            logging=false,
+                            workers=workers(),
+                        );
+
+
 
 ρ_s = out.x[1]./out.x[2]
 

@@ -176,7 +176,7 @@ The returned object `out` is an `ArrayPartition` containing two arrays. The firs
 ```
 
 ## Parallel execution
-The package supports parallel computation of stochastic trajectories using Julia's `Distributed` standard library. First, initialize the worker processes:
+The package supports parallel computation of stochastic trajectories using `Distributed` library. First, initialize the worker processes:
 
 ```julia
 using Distributed

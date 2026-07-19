@@ -30,7 +30,7 @@ function sampler_from_cache(
 
     @assert isfile(path) "Cache file does not exist: $path"
 
-    cache = load_object(path)
+    cache::AbstractBCFDecomposition = load_object(path)::AbstractBCFDecomposition
 
     if checks && !(cache isa AbstractBCFDecomposition)
         throw(ArgumentError("Expected a subtype of AbstractBCFDecomposition, got $(typeof(cache))."))
@@ -40,19 +40,20 @@ function sampler_from_cache(
 
     factor = _noise_factor(cache, checks)
 
-    container = zeros(ComplexF64, cache.time_grid.n_points)
+    n_points::Int=cache.time_grid.n_points
+    container = zeros(ComplexF64, n_points)
 
     return NoiseSampler(cache.time_grid, factor, container)
 end
 
 function _noise_factor(cache::BCFEigen, checks::Bool)
-    n_points = cache.time_grid.n_points
+    n_points::Int = cache.time_grid.n_points
     checks && @assert size(cache.vecs) == (n_points, n_points) "Expected a $n_points × $n_points matrix."
     return cache.vecs
 end
 
 function _noise_factor(cache::BCFCholesky, checks::Bool)
-    n_points = cache.time_grid.n_points
+    n_points::Int = cache.time_grid.n_points
     checks && @assert size(cache.chol) == (n_points, n_points) "Expected a $n_points × $n_points matrix."
     return cache.chol
 end

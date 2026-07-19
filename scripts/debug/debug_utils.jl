@@ -7,6 +7,15 @@ using Plots
 # Utilities.
 # =============================================================================
 
+function kwwrapper(mod::Module, f::Function)
+    name = string(nameof(f))
+    sym = only(filter(s ->
+        occursin("#$name#", String(s)) &&
+        !startswith(String(s), "##"),
+        names(mod; all=true)))
+    getfield(mod, sym)
+end
+
 """
     average_noise!(sampler!, trajectory_num, t_idx)
 

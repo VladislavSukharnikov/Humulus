@@ -1,4 +1,4 @@
-include("debug_utils.jl")
+include("debug_utils.jl");
 
 # =============================================================================
 # Debugging: reconstruct the BCF from Monte Carlo noise sampling.
@@ -205,14 +205,17 @@ let
                         checks=true, 
                         clear_cache=true
                     )
-    
-    f = getfield(Humulus, Symbol("#sampler_from_cache#13"))
+                    
+    # Find internal function.
+
+    f = kwwrapper(Humulus, Humulus.sampler_from_cache)
+
     @code_warntype f(
-        true,    # checks
-        true,    # clear_cache
-        Humulus.sampler_from_cache,
-        path,
-    )
+                    true,
+                    true,
+                    Humulus.sampler_from_cache,
+                    path,
+                )
 end
 
 
@@ -234,18 +237,21 @@ let
 
     # Trigger compilation.
     path = Humulus.get_cache(
-                                Humulus.BCFCholesky, 
-                                bcf, 
-                                t_end, 
-                                n_points;
-                                logging=true,
-                            )
+                        Humulus.BCFCholesky, 
+                        bcf, 
+                        t_end, 
+                        n_points;
+                        logging=true,
+                    )
+    rm(path)
 
-    @code_warntype Humulus.get_cache(
-                                Humulus.BCFCholesky, 
-                                bcf, 
-                                t_end, 
-                                n_points;
-                                logging=true,
-                            )
+    f = kwwrapper(Humulus, Humulus.get_cache)
+    @code_warntype f(
+        true,
+        Humulus.get_cache,
+        Humulus.BCFCholesky,
+        bcf,
+        t_end,
+        n_points,
+    )
 end

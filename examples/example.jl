@@ -84,7 +84,7 @@ max_occupancy = 50
 # Running HOPS on the main process. 
 # -----------------------------------------------------------------------------
 
-n_trajectories = 1
+n_trajectories = 100
 out = @time solve_hops(
     grid_params,
     bcf,

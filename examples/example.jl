@@ -18,6 +18,16 @@ bcf = let
     one_mode_squeezed_bcf(ω₀, Γ, r, φ, γ)
 end;
 
+# bcf = let
+#     ω₀ = 5.0        # central (carrier) frequency
+#     Γ₀ = 2.0        # input spectral width
+#     κ  = 1.0        # cavity loss rate
+#     ϵ  = 0.5        # effective DPA pump amplitude
+#     φ  = Float64(π) # squeezing phase
+#     γ  = 1.0        # atom–field coupling strength
+
+#     bcf = three_mode_squeezed_bcf(ω₀, Γ₀, κ, ϵ, φ, γ)
+# end;
 
 # -----------------------------------------------------------------------------
 # Atomic parameters

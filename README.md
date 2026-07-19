@@ -184,7 +184,7 @@ addprocs(n_workers)
 
 n_trajectories = 100
 
-out = @time solve_hops(
+out = solve_hops(
     grid_params,
     bcf,
     atom_params,

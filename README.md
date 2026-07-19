@@ -148,7 +148,7 @@ Alternatively, the hierarchy of pure states (HOPS) can be solved by specifying t
 
 ```julia
 n_trajectories = 1
-out = @time solve_hops(
+out = solve_hops(
     grid_params,
     bcf,
     atom_params,

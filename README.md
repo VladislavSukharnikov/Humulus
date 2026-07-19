@@ -100,8 +100,8 @@ The third required object defines the time grid used for the numerical integrati
 ```julia
 grid_params = let
     t_end    = 20.0  # final simulation time
-    n_save   = 250   # number of intervals between saved time points
-    substeps = 4     # maximum internal integration substeps per save interval
+    n_save   = 500   # number of intervals between saved time points
+    substeps = 5     # maximum internal integration substeps per save interval
 
     @info "Expected minimal number of steps is $(n_save * substeps)."
 

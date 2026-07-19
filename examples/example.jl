@@ -29,6 +29,7 @@ end;
 #     bcf = three_mode_squeezed_bcf(ω₀, Γ₀, κ, ϵ, φ, γ)
 # end;
 
+
 # -----------------------------------------------------------------------------
 # Atomic parameters
 # -----------------------------------------------------------------------------
@@ -97,6 +98,7 @@ out = @time solve_hops(
 
 ρ_s = out.x[1]./out.x[2];
 
+
 # -----------------------------------------------------------------------------
 # Distributed computation of HOPS.
 # -----------------------------------------------------------------------------
@@ -110,7 +112,7 @@ addprocs(n_workers)
 
 n_trajectories = 100
 n_batches = 100
-@info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches) "
+@info "Expected number of trajectories: $(n_trajectories*length(workers())*n_batches)."
 
 out = @batched n_batches solve_hops(
                             grid_params,

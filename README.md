@@ -147,22 +147,27 @@ This returns the reduced system density matrix `ρ_s` with dimensions `ρ_s[i, j
 Alternatively, the hierarchy of pure states (HOPS) can be solved by specifying the number of trajectories:
 
 ```julia
-n_trajectories = 1000
-
-out = solve_hops(
+n_trajectories = 1
+out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
-    max_occupancy,
-    n_trajectories;
+    max_occupancy;
+    n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
-)
+    logging=true,
+);
 ```
 
-The HOPS implementation caches the eigendecomposition of the BCF matrix. The keyword argument `clear_cache` determines whether the cached data is deleted after the computation completes. By default, `clear_cache=true`.
+The HOPS implementation caches the Cholesky decomposition of the noise covariance matrix. The keyword argument `clear_cache` determines whether the cached data is deleted after the computation completes. By default, `clear_cache=true`. To manually clear the cache at any time, call
 
-The cache is intended primarily for distributed computations. In such settings, sending large eigendecomposition matrices to workers causes significant serialization overhead. Instead, the eigendecomposition is stored in a `.jld2` file, which each worker can load independently. This approach is designed for computational clusters with a shared filesystem, such as the DESY Maxwell Cluster.
+```julia
+
+Humulus.clear_cache()
+```
+
+The cache is intended primarily for distributed computations. In such settings, sending large matrices to workers causes significant serialization overhead. Instead, the decomposition is stored in a `.jld2` file, which each worker can load independently. This approach is designed for computational clusters with a shared filesystem, such as the DESY Maxwell Cluster.
 
 The returned object `out` is an `ArrayPartition` containing two arrays. The first stores the accumulated density matrix over all trajectories, while the second contains the total number of trajectories. The physical density matrix is therefore obtained as
 
@@ -171,17 +176,20 @@ The returned object `out` is an `ArrayPartition` containing two arrays. The firs
 ```
 
 ## Parallel execution
-
-The package supports parallel computation of stochastic trajectories using Julia's `Distributed` standard library. Initialize workers and pass them to `solve_hops` via the `workers` keyword argument:
+The package supports parallel computation of stochastic trajectories using Julia's `Distributed` standard library. First, initialize the worker processes:
 
 ```julia
 using Distributed
 
-n_workers = 5
+n_workers = Sys.CPU_THREADS
 addprocs(n_workers)
 
 @everywhere using Humulus
+```
 
+Then pass the workers to `solve_hops` via the `workers` keyword argument:
+
+```julia
 n_trajectories = 100
 
 out = solve_hops(
@@ -190,16 +198,46 @@ out = solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories;
-    clear_cache=true,
-    show_progress=false,
-    workers=workers(),
+    clear_cache = true,
+    show_progress = false,
+    workers = workers(),
 )
-
-ρ_s = out.x[1] / out.x[2]
 ```
 
-In this example, each of the `n_workers` workers computes `n_trajectories` independent trajectories. Consequently, `out.x[2]` is expected to equal `n_workers * n_trajectories`.
+In this example, each of the `n_workers` worker processes computes `n_trajectories` independent trajectories. Therefore, the expected total number of trajectories is
 
+```julia
+n_workers * n_trajectories
+```
+
+and `out.x[2]` should equal this value.
+
+For long-running calculations, it is often preferable to split the computation into multiple batches. This makes the calculation more robust: if one or more workers disconnect during execution, the results from completed batches are preserved. The `@batched` macro provides this functionality:
+
+```julia
+n_trajectories = 100
+n_batches = 100
+
+out = @batched n_batches solve_hops(
+    grid_params,
+    bcf,
+    atom_params,
+    max_occupancy;
+    n_trajectories = n_trajectories,
+    clear_cache = false,
+    show_progress = false,
+    logging = false,
+    workers = workers(),
+)
+```
+
+In this case, each worker computes `n_trajectories` trajectories in each of the `n_batches` batches. Therefore, the expected total number of trajectories is
+
+```julia
+n_workers * n_trajectories * n_batches
+```
+
+and `out.x[2]` should again equal this value upon successful completion.
 ---
 
 ## Citation

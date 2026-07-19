@@ -92,6 +92,7 @@ out = @time solve_hops(
     n_trajectories=n_trajectories,
     clear_cache=false,
     show_progress=true,
+    logging=true,
 );
 
 ρ_s = out.x[1]./out.x[2];

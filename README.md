@@ -59,9 +59,9 @@ First, load the package:
 using Humulus
 ```
 
-Several usage examples are provided in the `examples` directory.
+Usage example is provided in the `examples` directory.
 
-Before running a simulation, all parameters required for the integration must be initialized. One of the required objects is the bath-correlation function (BCF). Although the internal API supports arbitrary BCF definitions, the public constructors currently include squeezed reservoirs. For example, in `example1.jl`:
+Before running a simulation, all parameters required for the integration must be initialized. One of the required objects is the bath-correlation function (BCF). Although the internal API supports arbitrary BCF definitions, the public constructors currently include squeezed reservoirs. For example, in `examples/example.jl`:
 
 ```julia
 bcf = let

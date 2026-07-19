@@ -10,7 +10,7 @@ module Humulus
     # Data structures and utilities
     using StaticArrays: SVector, MVector, setindex
     using RecursiveArrayTools: ArrayPartition
-    using LinearAlgebra: mul!, eigen!, Hermitian
+    using LinearAlgebra: mul!, Hermitian, eigen!, cholesky!, LowerTriangular
 
     # Input/output/caching
     using JLD2: save_object, load_object

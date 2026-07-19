@@ -15,8 +15,10 @@ using Humulus:
     FuncWrapper,
     FockSpace,
     BCFEigen,
+    BCFCholesky,
     TimeGrid,
     sampler_from_cache,
     HME,
     HOPS, 
-    create_solver_params
+    create_solver_params,
+    _noise_factor

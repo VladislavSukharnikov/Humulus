@@ -43,7 +43,7 @@ end
 grid_params = let
     t_end    = 20.0  # final simulation time
     n_save   = 250   # number of intervals between saved time points
-    substeps = 4     # maximum internal integration substeps per save interval
+    substeps = 5     # maximum internal integration substeps per save interval
     @info "Expected minimal number of steps is $(n_save*substeps)."
     GridParams(t_end, n_save, substeps)
 end
@@ -74,13 +74,13 @@ max_occupancy = 50
 # -----------------------------------------------------------------------------
 
 n_trajectories = 1
-out = solve_hops(
+out = @time solve_hops(
     grid_params,
     bcf,
     atom_params,
     max_occupancy;
     n_trajectories=n_trajectories,
-    clear_cache=false,
+    clear_cache=true,
     show_progress=true,
 );
 

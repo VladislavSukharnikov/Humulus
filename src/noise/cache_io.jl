@@ -23,41 +23,43 @@ An exception is thrown if
 - `checks=true` and the loaded data are invalid.
 """
 function sampler_from_cache(
-                path::String; 
-                checks::Bool=true, 
-                clear_cache::Bool=false,
-            )
+                        path::String;
+                        checks::Bool=true,
+                        clear_cache::Bool=false,
+                    )
 
     @assert isfile(path) "Cache file does not exist: $path"
 
-    # Load precomputed data from disk.
-    bcf_eigen::BCFEigen = load_object(path)::BCFEigen
+    cache = load_object(path)
+
+    if checks && !(cache isa AbstractBCFDecomposition)
+        throw(ArgumentError("Expected a subtype of AbstractBCFDecomposition, got $(typeof(cache))."))
+    end
+
     clear_cache && rm(path)
 
-    # Extract the stored bath correlation matrix eigendecomposition.
-    (; time_grid, vals, vecs) = bcf_eigen
-    n_points = time_grid.n_points
+    factor = _noise_factor(cache, checks)
 
-    if checks
-        @assert length(vals) == n_points "Expected $n_points eigenvalues."
-        @assert size(vecs) == (n_points, n_points) "Expected a $n_points × $n_points eigenvector matrix."
-    end
-        
-    # Warn if any eigenvalues are negative. This may indicate numerical
-    # inaccuracies or that the BCF is not positive semidefinite.
-    if any(vals .< 0)
-        @warn "The discretized BCF matrix has negative eigenvalues."
-    end
+    container = zeros(ComplexF64, cache.time_grid.n_points)
 
-    # Workspace used during noise generation to avoid repeated allocations.
-    container = zeros(ComplexF64, n_points)
+    return NoiseSampler(cache.time_grid, factor, container)
+end
 
-    return NoiseSampler(time_grid, vals, vecs, container)
+function _noise_factor(cache::BCFEigen, checks::Bool)
+    n_points = cache.time_grid.n_points
+    checks && @assert size(cache.vecs) == (n_points, n_points) "Expected a $n_points × $n_points matrix."
+    return cache.vecs
+end
+
+function _noise_factor(cache::BCFCholesky, checks::Bool)
+    n_points = cache.time_grid.n_points
+    checks && @assert size(cache.chol) == (n_points, n_points) "Expected a $n_points × $n_points matrix."
+    return cache.chol
 end
 
 
 """
-    get_bcf_eigen_cache(bcf, t_end, grid_size)
+    get_covariance_cache(bcf, t_end, grid_size)
 
 Return the path to a cached `BCFEigen` object.
 
@@ -84,30 +86,31 @@ An existing cache file is reused only if its contents are consistent with
 the requested parameters. Otherwise, it is replaced with a newly generated
 cache.
 """
-function get_bcf_eigen_cache(
+function get_covariance_cache(
+                        ::Type{T},
                         bcf::BCF,
                         t_end::Float64,
                         grid_size::Int;
                         logging::Bool=true,
-                    )
+                    ) where {T<:AbstractBCFDecomposition}
 
-    dir = "bcf_eigen_cache"
+    dir = "covariance_cache"
     mkpath(dir)
 
-    key      = (t_end, bcf, grid_size)
+    key      = (T, t_end, bcf, grid_size)
     filename = string(hash(key), ".jld2")
     path     = joinpath(dir, filename)
 
     if isfile(path)
         try
-            bcf_eigen::BCFEigen = load_object(path)::BCFEigen
-            loaded_bcf::BCF     = bcf_eigen.bcf::BCF
+            cached::T = load_object(path)::T
+            loaded_bcf::BCF = cached.bcf::BCF
 
             logging && @info "Found an existing cache."
-            if  loaded_bcf == bcf &&
-                bcf_eigen.time_grid[1] == 0.0 &&
-                bcf_eigen.time_grid[end] >= t_end &&
-                bcf_eigen.time_grid.n_points == grid_size 
+            if loaded_bcf == bcf &&
+                cached.time_grid[1] == 0.0 &&
+                cached.time_grid[end] >= t_end &&
+                cached.time_grid.n_points == grid_size 
 
                 logging && @info "The existing cache is compatible. Reusing it."
                 return path
@@ -120,24 +123,24 @@ function get_bcf_eigen_cache(
         logging && @info "No existing cache found. Building a new one."
     end
 
-    logging && @info "Computing the eigendecomposition of the discretized bath correlation matrix ($grid_size × $grid_size)."
-    bcf_eigen = BCFEigen(bcf, t_end, grid_size)
-    save_object(path, bcf_eigen)
-    logging && @info "Eigendecomposition completed. Results saved to \"$path\"."
+    logging && @info "Computing the decomposition of the covariance matrix ($grid_size × $grid_size)."
+    cached = T(bcf, t_end, grid_size)
+    save_object(path, cached)
+    logging && @info "Decomposition completed. Results saved to \"$path\"."
 
     return path
 end
 
 
 """
-    clear_bcf_eigen_cache()
+    clear_covariance_cache()
 
 Remove all cached `BCFEigen` objects.
 
 If the cache directory does not exist, the function does nothing.
 """
-function clear_bcf_eigen_cache()
-    dir = "bcf_eigen_cache"
+function clear_covariance_cache()
+    dir = "covariance_cache"
     isdir(dir) || return nothing
 
     # Remove all cached eigendecompositions.

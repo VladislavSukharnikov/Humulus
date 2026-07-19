@@ -1,5 +1,5 @@
 """
-    FockSpace(::Val{N}, max_occupancies; KeyType=Int, IndType=Int)
+    FockSpace(::Val{N}, max_occupancies, KeyType=Int, IndType=Int)
 
 Construct and return a truncated `N`-mode Fock space.
 
@@ -14,8 +14,6 @@ for basis indexing and neighboring basis states.
 
 # Arguments
 - `max_occupancies`: occupation-number truncation.
-
-# Keyword arguments
 - `KeyType`: integer type used to store occupation numbers.
 - `IndType`: integer type used to store basis indices.
 
@@ -30,7 +28,7 @@ An exception is thrown if
 """
 function FockSpace(
                 ::Val{N},
-                max_occupancies::Union{NTuple{N,Int},Int,Vector{Int}};
+                max_occupancies::Union{NTuple{N,Int},Int,Vector{Int}},
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int
             ) where {N}

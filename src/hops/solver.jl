@@ -40,7 +40,7 @@ function solve_hops(
                 atom_params::AtomParams,
                 max_occupancies::Union{NTuple{N,Int},Int};
                 n_trajectories::Int=1,
-                noise_oversampling::Int=2,
+                noise_oversampling::Int=4,
                 KeyType::Type{<:Integer}=Int,
                 IndType::Type{<:Integer}=Int,
                 clear_cache::Bool=true,
@@ -57,7 +57,7 @@ function solve_hops(
         throw(ArgumentError("noise_oversampling must be at least 2, got $noise_oversampling"))
 
     # Construct the pseudo-Fock space and solver parameters.
-    fock_space      = FockSpace(Val(N), max_occupancies, KeyType=KeyType, IndType=IndType)
+    fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
     solver_params   = create_solver_params(bcf, fock_space, atom_params)
     max_fock_states = maximum(max_occupancies)+1
 
@@ -67,7 +67,7 @@ function solve_hops(
     grid_size = ceil(Int, (ts_save.t_end) / dt_noise)
 
     # Compute or retrieve the cached BCF eigenvalue decomposition.
-    path = get_bcf_eigen_cache(bcf, ts_save.t_end, grid_size; logging=logging)
+    path = get_covariance_cache(BCFCholesky, bcf, ts_save.t_end, grid_size; logging=logging)
 
     # Solve the HOPS equations serially or in parallel.
     if workers==[1] || length(workers)==1 || length(workers)==0
@@ -117,7 +117,7 @@ end
     (; dt_max, ts_save) = grid_params
 
     # Construct the noise sampler.
-    sampler!::NoiseSampler = sampler_from_cache(path; checks=false, clear_cache=false)::NoiseSampler;
+    sampler!::NoiseSampler = sampler_from_cache(path; checks=false, clear_cache=false)::NoiseSampler
 
     # Allocate the output density matrix.
     ρ_s = zeros(ComplexF64, 2, 2, ts_save.n_points)
@@ -128,8 +128,8 @@ end
 
     # Create ODE problem.
     (; fock_dim, c_g, c_e) = solver_params
-    u0    = init_hops(fock_dim, N, c_g, c_e)
-    prob  = ODEProblem{true}(
+    u0 = init_hops(fock_dim, N, c_g, c_e)
+    prob = ODEProblem{true}(
                         ODEFunction{true}(hops!), 
                         u0, 
                         (ts_save.t_start, ts_save.t_end), 

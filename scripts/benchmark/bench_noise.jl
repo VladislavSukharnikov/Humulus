@@ -1,11 +1,11 @@
 include("bench_utils.jl");
 
 # =============================================================================
-# Benchmark BCFEigen construction.
+# Benchmark BCFCholesky construction.
 # =============================================================================
 
 let
-    title = "Benchmark BCFEigen construction."
+    title = "Benchmark BCFCholesky construction."
     print_header(title)
 
     # Construct BCF.
@@ -16,12 +16,12 @@ let
     t_end     = 20.0
     grid_size = 1000
 
-    bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
+    bcf_chol = Humulus.BCFCholesky(bcf, t_end, grid_size)
 
     @info "Benchmark parameters:" grid_size
 
-    bench = @benchmark Humulus.BCFEigen($bcf, $t_end, $grid_size)
-    benchmark_construction(bcf_eigen, bench)
+    bench = @benchmark Humulus.BCFCholesky($bcf, $t_end, $grid_size)
+    benchmark_construction(bcf_chol, bench)
 end
 
 
@@ -40,11 +40,11 @@ let
     t_end = 20.0
     grid_size = 5_000
 
-    bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
+    bcf_chol = Humulus.BCFCholesky(bcf, t_end, grid_size)
 
-    mkpath("bcf_eigen_cache")
-    path = joinpath("bcf_eigen_cache", "bench_noise.jld2")
-    save_object(path, bcf_eigen)
+    mkpath("covariance_cache")
+    path = joinpath("covariance_cache", "bench_noise.jld2")
+    save_object(path, bcf_chol)
 
     sampler! = Humulus.sampler_from_cache(path; checks = true, clear_cache = false);
 
@@ -69,15 +69,15 @@ let
     @info "Three-mode squeezed reservoir BCF."
 
     sampler! = let
-        t_end = 20.0
-        grid_size = 500
+        t_end = 1.0
+        grid_size = 2000
 
-        bcf_eigen = Humulus.BCFEigen(bcf, t_end, grid_size)
+        bcf_chol = Humulus.BCFCholesky(bcf, t_end, grid_size)
 
-        mkpath("bcf_eigen_cache")
-        path = joinpath("bcf_eigen_cache", "bench_noise.jld2")
+        mkpath("covariance_cache")
+        path = joinpath("covariance_cache", "bench_noise.jld2")
 
-        save_object(path, bcf_eigen)
+        save_object(path, bcf_chol)
 
         Humulus.sampler_from_cache(path, checks = true, clear_cache = true)
     end

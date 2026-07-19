@@ -36,7 +36,7 @@ function solve_hme(
             ) where {N}
     
     # Construct the pseudo-Fock space and solver parameters.
-    fock_space      = FockSpace(Val(N), max_occupancies, KeyType=KeyType, IndType=IndType)
+    fock_space      = FockSpace(Val(N), max_occupancies, KeyType, IndType)
     solver_params   = create_solver_params(bcf, fock_space, atom_params)
     max_fock_states = maximum(max_occupancies)+1
 

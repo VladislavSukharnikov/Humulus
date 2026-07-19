@@ -1,5 +1,5 @@
 # Cache
-bcf_eigen_cache/
+covariance_cache/
 
 # Julia
 *.ji

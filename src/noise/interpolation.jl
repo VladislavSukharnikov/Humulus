@@ -16,12 +16,8 @@ An `AssertionError` is thrown if
 - `t` lies outside `time_grid`; or
 - `noise` and `time_grid` have different lengths.
 """
-@inline function interpolate_noise(
-                                time_grid::TimeGrid, 
-                                noise::Vector{ComplexF64}, 
-                                t::Float64,
-                            )
-                            
+@inline function interpolate_noise(time_grid::TimeGrid, noise::Vector{ComplexF64}, t::Float64)
+    # Internal input validation.
     @assert t>=time_grid[1]&&t<=time_grid[end]  "Time value out of bounds for interpolation."
     @assert length(noise)==length(time_grid)    "Mismatch of size of discrete noise and grid."
 

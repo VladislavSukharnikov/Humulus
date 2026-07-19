@@ -1,62 +1,110 @@
 # =============================================================================
-# Noise Parameters.
+# Covariance Matrix Decompositions.
+#
+# The Cholesky decomposition is the default and recommended representation.
+# The eigendecomposition is retained only for testing and validation.
 # =============================================================================
 
-"""
-    BCFEigen
+abstract type AbstractBCFDecomposition end
 
-Precomputed eigendecomposition of a discretized bath-correlation function (BCF).
+
+"""
+    BCFCholesky
+
+Precomputed Cholesky factorization of the covariance matrix obtained by
+discretizing the bath-correlation function (BCF).
+
+The stored factor `chol` satisfies
+
+    bcf_covariance = chol * chol'
+
+and is used to generate correlated Gaussian noise efficiently.
 
 # Fields
 - `bcf`: bath-correlation function.
 - `time_grid`: time grid used to discretize the BCF.
-- `vals`: square roots of the eigenvalues of the discretized BCF kernel.
-- `vecs`: eigenvectors of the discretized BCF kernel.
+- `chol`: lower-triangular Cholesky factor of the covariance matrix.
 """
-struct BCFEigen
+struct BCFCholesky <: AbstractBCFDecomposition
     # Bath-correlation function used to construct the matrix.
-    bcf::BCF
+    bcf       :: BCF
 
-    # Time grid on which the BCF was discretized.
-    time_grid::TimeGrid
+    # Time grid on which the covariance matrix was discretized.
+    time_grid :: TimeGrid
 
-    # Square roots of the eigenvalues of the discretized BCF kernel.
-    vals::Vector{Float64}
-
-    # Eigenvectors of the discretized BCF kernel.
-    vecs::Matrix{ComplexF64}
+    # Cholesky decomposition.
+    chol      :: LowerTriangular{ComplexF64, Matrix{ComplexF64}}
 end
 
 
 # =============================================================================
 # Noise Generation. 
 # =============================================================================
+
 """
     NoiseSampler
 
-Generator of stochastic noise realizations from a precomputed bath
-correlation function (BCF) eigendecomposition.
+Generator of correlated Gaussian noise from a precomputed covariance-matrix
+decomposition.
 
-The type stores the discretization grid, the eigendecomposition of the
-discretized BCF kernel, and a reusable workspace to avoid repeated memory
-allocations during noise generation.
+The sampler stores a matrix `A` satisfying
+
+    bcf_covariance = A * A'
+
+and generates correlated noise by multiplying a vector of independent complex
+Gaussian random variables by `A`.
+
+The matrix `A` may originate from any covariance-matrix decomposition
+(e.g. Cholesky factorization or the eigendecomposition).
 
 # Fields
-- `_time_grid`: time grid used to discretize the BCF.
-- `_vals`: square roots of the eigenvalues of the discretized BCF kernel.
-- `_vecs`: eigenvectors of the discretized BCF kernel.
+- `_time_grid`: time grid used to discretize the covariance matrix.
+- `_A`: matrix satisfying `bcf_covariance = A * A'`.
 - `container`: reusable workspace for noise generation.
 """
-struct NoiseSampler
-    # Time grid on which the BCF was discretized.
+struct NoiseSampler{M}
+    # Time grid on which the covariance matrix was discretized.
     _time_grid::TimeGrid
 
-    # Square roots of the eigenvalues of the discretized BCF kernel.
-    _vals::Vector{Float64}
-
-    # Eigenvectors of the discretized BCF kernel.
-    _vecs::Matrix{ComplexF64}
+    # Matrix A satisfying C = A*A'.
+    _A::M
 
     # Storage reused during noise generation to avoid repeated allocations.
     container::Vector{ComplexF64}
+end
+
+
+# =============================================================================
+# Legacy decomposition.
+# =============================================================================
+
+"""
+    BCFEigen
+
+Legacy covariance-matrix decomposition retained for testing and validation.
+
+This type stores the scaled eigendecomposition of the covariance matrix,
+
+    bcf_covariance = vecs * vecs'
+
+where the columns of `vecs` are the eigenvectors scaled by the square roots
+of the corresponding eigenvalues.
+
+`BCFEigen` is **not** used by the production noise-generation pipeline.
+
+# Fields
+- `bcf`: bath-correlation function.
+- `time_grid`: time grid used to discretize the BCF.
+- `vecs`: eigenvectors scaled by the square roots of the corresponding
+  eigenvalues.
+"""
+struct BCFEigen <: AbstractBCFDecomposition
+    # Bath-correlation function used to construct the matrix.
+    bcf       :: BCF
+
+    # Time grid on which the covariance matrix was discretized.
+    time_grid :: TimeGrid
+
+    # Scaled eigenvectors of the covariance matrix.
+    vecs      :: Matrix{ComplexF64}
 end

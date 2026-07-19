@@ -12,7 +12,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
+        path = Humulus.get_covariance_cache(Humulus.BCFCholesky, bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -63,7 +63,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 20
-        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
+        path = Humulus.get_covariance_cache(Humulus.BCFCholesky, bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -122,7 +122,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
+        path = Humulus.get_covariance_cache(Humulus.BCFCholesky, bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -134,15 +134,17 @@ let
     z = zeros(ComplexF64, grid_size)
 
     # Trigger compilation. 
-    sampler!(z)
+    checks=true
+    sampler!(z, checks)
 
-    @code_warntype sampler!(z)
+    @code_warntype sampler!(z, checks)
 end
 
 
 # =============================================================================
 # Debugging: @code_warntype inspection of interpolate_noise(...).
 # =============================================================================
+
 let 
     println("\n\n===================================================")
     println("Running @code_warntype for `interpolate_noise(...)`")
@@ -155,7 +157,7 @@ let
     sampler! = let 
         t_end     = 20.0
         grid_size = 1000
-        path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
+        path = Humulus.get_covariance_cache(Humulus.BCFCholesky, bcf, t_end, grid_size)
         sampler! = Humulus.sampler_from_cache(
                                         path; 
                                         checks=true, 
@@ -195,7 +197,7 @@ let
     grid_size = 20
 
     # Create cache.
-    path = Humulus.get_bcf_eigen_cache(bcf, t_end, grid_size)
+    path = Humulus.get_covariance_cache(Humulus.BCFCholesky, bcf, t_end, grid_size)
 
     # Trigger compilation.
     sampler! = Humulus.sampler_from_cache(
@@ -204,20 +206,22 @@ let
                         clear_cache=true
                     )
     
-    @code_warntype Humulus.sampler_from_cache(
-                        path, 
-                        checks=true, 
-                        clear_cache=true
-                    )
+    f = getfield(Humulus, Symbol("#sampler_from_cache#13"))
+    @code_warntype f(
+        true,    # checks
+        true,    # clear_cache
+        Humulus.sampler_from_cache,
+        path,
+    )
 end
 
 
 # =============================================================================
-# Debugging: @code_warntype inspection of get_bcf_eigen_cache(...).
+# Debugging: @code_warntype inspection of get_covariance_cache(...).
 # =============================================================================
 let 
     println("\n\n===================================================")
-    println("Running @code_warntype for `get_bcf_eigen_cache(...)`")
+    println("Running @code_warntype for `get_covariance_cache(...)`")
     println("===================================================\n")
 
     # Construct BCF.
@@ -229,8 +233,21 @@ let
     n_points = 100;
 
     # Trigger compilation.
-    path = Humulus.get_bcf_eigen_cache(bcf, t_end, n_points)
-    rm(path)
+    path = Humulus.get_covariance_cache(
+                                Humulus.BCFCholesky, 
+                                bcf, 
+                                t_end, 
+                                n_points;
+                                logging=true,
+                            )
 
-    @code_warntype Humulus.get_bcf_eigen_cache(bcf, t_end, n_points)
+    f = getfield(Humulus, Symbol("#get_covariance_cache#27"))
+    @code_warntype f(
+        true,                       # logging
+        Humulus.get_covariance_cache,
+        Humulus.BCFCholesky,
+        bcf,
+        t_end,
+        n_points,
+    )
 end

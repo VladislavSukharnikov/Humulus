@@ -22,7 +22,7 @@ let
     time_grid = Humulus.TimeGrid(0.0, 1.0, 100)
     hops! = Humulus.HOPS{N,max_fock_states}(time_grid)
 
-    # Generate arguments for hme!.
+    # Generate arguments for hops!.
     fock_dim = fock_space.fock_dim
     dψ = rand(ComplexF64, 2, fock_dim)
     ψ  = rand(ComplexF64, 2, fock_dim)

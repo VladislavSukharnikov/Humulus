@@ -60,7 +60,7 @@ let
     # Trigger compilation.
     hme!(dρ, ρ, solver_params, t)
 
-    @info "Benchmark parameters:" N max_occupancies
+    @info "Benchmark parameters:" N fock_dim
 
     bench = @benchmark $hme!($dρ, $ρ, $solver_params, $t)
     benchmark_evaluation(bench)

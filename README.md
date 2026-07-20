@@ -198,9 +198,9 @@ out = solve_hops(
     atom_params,
     max_occupancy,
     n_trajectories;
-    clear_cache = true,
-    show_progress = false,
-    workers = workers(),
+    clear_cache=true,
+    show_progress=false,
+    workers=workers(),
 )
 ```
 
@@ -223,11 +223,11 @@ out = @batched n_batches solve_hops(
     bcf,
     atom_params,
     max_occupancy;
-    n_trajectories = n_trajectories,
-    clear_cache = false,
-    show_progress = false,
-    logging = false,
-    workers = workers(),
+    n_trajectories=n_trajectories,
+    clear_cache=false,
+    show_progress=false,
+    logging=false,
+    workers=workers(),
 )
 ```
 

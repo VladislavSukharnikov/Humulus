@@ -54,20 +54,24 @@ let
     time_grid = Humulus.TimeGrid(0.0, 1.0, 10_000)
 
     # Construct HOPS.
-    hme! = Humulus.HOPS{N,max_fock_states}(time_grid)
+    hops! = Humulus.HOPS{N,max_fock_states}(time_grid)
 
     # Generate arguments for hops!.
     fock_dim = fock_space.fock_dim
-    dρ = rand(ComplexF64, 2, 2, fock_dim, fock_dim)
-    ρ  = rand(ComplexF64, 2, 2, fock_dim, fock_dim)
+    dψ = rand(ComplexF64, 2, fock_dim)
+    ψ  = rand(ComplexF64, 2, fock_dim)
+    dX = rand(ComplexF64, N, 1)
+    X  = rand(ComplexF64, N, 1)
+    du = ArrayPartition(dψ, dX)
+    u  = ArrayPartition(ψ, X)
     solver_params = Humulus.create_solver_params(bcf, fock_space, atom_params)
     t = rand()
 
     # Trigger compilation.
-    hme!(dρ, ρ, solver_params, t)
+    hops!(du, u, solver_params, t)
 
-    @info "Benchmark parameters:" N max_occupancies
+    @info "Benchmark parameters:" N fock_dim time_grid.n_points
 
-    bench = @benchmark $hme!($dρ, $ρ, $solver_params, $t)
+    bench = @benchmark $hops!($du, $u, $solver_params, $t)
     benchmark_evaluation(bench)
 end

@@ -1,4 +1,4 @@
-include("prof_utils.jl");
+include("profile_utils.jl");
 
 # =============================================================================
 # Profile repeated FockSpace construction.

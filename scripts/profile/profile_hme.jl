@@ -1,4 +1,4 @@
-include("prof_utils.jl")
+include("profile_utils.jl")
 
 # =============================================================================
 # Profile repeated BCF evaluation for the three-mode squeezed reservoir.
